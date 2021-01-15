@@ -8,19 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@mikro-orm/core");
+const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 const Game_1 = require("./entities/Game");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    const orm = yield core_1.MikroORM.init({
-        entities: [Game_1.Game],
-        dbName: "ChessDB",
-        user: "ChessDB",
-        password: "ChessDBQL",
-        type: "postgresql",
-        debug: true,
-    });
-    const game = orm.em.create(Game_1.Game, { id: 1, pgn: "waguan" });
+    const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
+    yield orm.getMigrator().up();
+    const game = orm.em.create(Game_1.Game, { pgn: "waguan slimes" });
     yield orm.em.persistAndFlush(game);
 });
 main().catch((e) => console.log(e));

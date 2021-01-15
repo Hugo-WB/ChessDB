@@ -1,18 +1,30 @@
-import { Entity, PrimaryKey, Property, ManyToOne, ManyToMany, Collection } from "@mikro-orm/core";
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  ManyToOne,
+  ManyToMany,
+  Collection,
+} from "@mikro-orm/core";
+import {Player} from "./Player"
 @Entity()
 export class Game {
-
   @PrimaryKey()
   id!: number;
 
   // @Property()
   // date:Date = new Date();
 
-  @Property()
-  pgn!:string;
+  @Property({ type: "text" })
+  pgn!: string;
 
 
   // define white and black player
+  @ManyToOne()
+  white: Player
+
+  @ManyToOne()
+  black: Player
 
   // @ManyToOne() // when you provide correct type hint, ORM will read it for you
   // author!: Author;
@@ -27,6 +39,4 @@ export class Game {
   //   this.title = title;
   //   this.author = author;
   // }
-
-
 }

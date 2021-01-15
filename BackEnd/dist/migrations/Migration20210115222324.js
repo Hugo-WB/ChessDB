@@ -9,19 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@mikro-orm/core");
-const Game_1 = require("./entities/Game");
-const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    const orm = yield core_1.MikroORM.init({
-        entities: [Game_1.Game],
-        dbName: "ChessDB",
-        user: "ChessDB",
-        password: "ChessDBQL",
-        type: "postgresql",
-        debug: true,
-    });
-    const game = orm.em.create(Game_1.Game, { id: 1, pgn: "waguan" });
-    yield orm.em.persistAndFlush(game);
-});
-main().catch((e) => console.log(e));
-//# sourceMappingURL=index.js.map
+exports.Migration20210115222324 = void 0;
+const migrations_1 = require("@mikro-orm/migrations");
+class Migration20210115222324 extends migrations_1.Migration {
+    up() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.addSql('create table "player" ("id" serial primary key, "name" text not null, "rating" int4 not null);');
+            this.addSql('create table "game" ("id" serial primary key, "pgn" text not null);');
+        });
+    }
+}
+exports.Migration20210115222324 = Migration20210115222324;
+//# sourceMappingURL=Migration20210115222324.js.map
