@@ -4,9 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc .",
+    "dev": "nodemon dist/index.js",
+    "watch":"tsc -w"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@mikro-orm/core": "^4.3.4",
+    "@mikro-orm/postgresql": "^4.3.4"
+  },
+  "mikro-orm": {
+      "useTsNode": true,
+      "configPaths": [
+        "./src/mikro-orm.config.ts",
+        "./dist/mikro-orm.config.js"
+      ]
+    }
 }
