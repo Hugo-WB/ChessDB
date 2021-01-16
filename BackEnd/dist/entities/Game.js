@@ -11,26 +11,32 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
 const core_1 = require("@mikro-orm/core");
+const type_graphql_1 = require("type-graphql");
 const Player_1 = require("./Player");
 let Game = class Game {
 };
 __decorate([
+    type_graphql_1.Field(() => type_graphql_1.Int),
     core_1.PrimaryKey(),
     __metadata("design:type", Number)
 ], Game.prototype, "id", void 0);
 __decorate([
+    type_graphql_1.Field(() => String),
     core_1.Property({ type: "text" }),
     __metadata("design:type", String)
 ], Game.prototype, "pgn", void 0);
 __decorate([
+    type_graphql_1.Field(() => Player_1.Player),
     core_1.ManyToOne({ nullable: true }),
     __metadata("design:type", Player_1.Player)
 ], Game.prototype, "white", void 0);
 __decorate([
+    type_graphql_1.Field(() => Player_1.Player),
     core_1.ManyToOne({ nullable: true }),
     __metadata("design:type", Player_1.Player)
 ], Game.prototype, "black", void 0);
 Game = __decorate([
+    type_graphql_1.ObjectType(),
     core_1.Entity()
 ], Game);
 exports.Game = Game;

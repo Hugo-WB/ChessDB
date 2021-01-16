@@ -12,17 +12,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
 const core_1 = require("@mikro-orm/core");
 const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
-const Game_1 = require("./entities/Game");
-const Player_1 = require("./entities/Player");
+const express_1 = __importDefault(require("express"));
+const apollo_server_express_1 = require("apollo-server-express");
+const type_graphql_1 = require("type-graphql");
+const GameResolver_1 = require("./resolvers/GameResolver");
+const PlayerResolver_1 = require("./resolvers/PlayerResolver");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
     yield orm.getMigrator().up();
-    const magnus = orm.em.getReference(Player_1.Player, 1);
-    const hikaru = orm.em.getReference(Player_1.Player, 2);
-    const game = orm.em.create(Game_1.Game, { pgn: "waguan drillas", black: hikaru, white: magnus });
-    yield orm.em.persistAndFlush(game);
+    const app = express_1.default();
+    const apolloServer = new apollo_server_express_1.ApolloServer({
+        schema: yield type_graphql_1.buildSchema({
+            resolvers: [GameResolver_1.GameResovler, PlayerResolver_1.PlayerResovler],
+        }),
+        context: () => ({ em: orm.em }),
+    });
+    apolloServer.applyMiddleware({ app });
+    app.listen(4000, () => {
+        console.log("Server started on localhost:4000");
+    });
 });
 main().catch((e) => console.log(e));
 //# sourceMappingURL=index.js.map

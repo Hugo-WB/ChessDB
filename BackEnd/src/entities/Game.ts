@@ -6,37 +6,25 @@ import {
   ManyToMany,
   Collection,
 } from "@mikro-orm/core";
-import {Player} from "./Player"
+import { Field, Int, ObjectType } from "type-graphql";
+import { Player } from "./Player";
+
+@ObjectType()
 @Entity()
 export class Game {
+  @Field(() => Int)
   @PrimaryKey()
   id!: number;
 
-  // @Property()
-  // date:Date = new Date();
-
+  @Field(() => String)
   @Property({ type: "text" })
   pgn!: string;
 
+  @Field(() => Player)
+  @ManyToOne({ nullable: true })
+  white?: Player;
 
-  // define white and black player
-  @ManyToOne({nullable:true})
-  white?: Player
-
-  @ManyToOne({nullable:true})
-  black?: Player
-
-  // @ManyToOne() // when you provide correct type hint, ORM will read it for you
-  // author!: Author;
-
-  // @ManyToOne(() => Publisher) // or you can specify the entity as class reference or string name
-  // publisher?: Publisher;
-
-  // @ManyToMany() // owning side can be simple as this!
-  // tags = new Collection<BookTag>(this);
-
-  // constructor(title: string, author: Author) {
-  //   this.title = title;
-  //   this.author = author;
-  // }
+  @Field(() => Player)
+  @ManyToOne({ nullable: true })
+  black?: Player;
 }

@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
 
 import mikroConfig from "./mikro-orm.config";
@@ -5,21 +6,35 @@ import mikroConfig from "./mikro-orm.config";
 import { Game } from "./entities/Game";
 import { Player } from "./entities/Player";
 
+import express from "express";
+import { ApolloServer } from "apollo-server-express";
+import { buildSchema } from "type-graphql";
+
+// Resolvers:
+import { GameResovler } from "./resolvers/GameResolver";
+import { PlayerResovler } from "./resolvers/PlayerResolver";
+
 const main = async () => {
+  // MikroORM:
   const orm = await MikroORM.init(mikroConfig);
   await orm.getMigrator().up();
 
-  const magnus = orm.em.getReference(Player, 1);
-  const hikaru = orm.em.getReference(Player, 2);
+  // Express:
+  const app = express();
 
-  const game = orm.em.create(Game, { pgn: "waguan drillas" ,black:hikaru,white:magnus});
+  // Apollo Server:
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [GameResovler,PlayerResovler],
+    }),
+    context: () => ({ em: orm.em }),
+  });
 
-  await orm.em.persistAndFlush(game);
-  // const player = orm.em.create(Player, { name: "magnus carlsen",rating:6969 });
-  // const player2 = orm.em.create(Player,{name:"Hikaru",rating:6968})
-  // await orm.em.persistAndFlush(player);
-  // await orm.em.persistAndFlush(player2)
-  // const playerWhite = orm.em.getReference(Player,)
+  apolloServer.applyMiddleware({ app });
+
+  app.listen(4000, () => {
+    console.log("Server started on localhost:4000");
+  });
 };
 
 main().catch((e) => console.log(e));

@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 const core_1 = require("@mikro-orm/core");
+const type_graphql_1 = require("type-graphql");
 const Game_1 = require("./Game");
 let Player = class Player {
     constructor() {
@@ -19,34 +20,45 @@ let Player = class Player {
     }
 };
 __decorate([
+    type_graphql_1.Field(() => type_graphql_1.Int),
     core_1.PrimaryKey(),
     __metadata("design:type", Number)
 ], Player.prototype, "id", void 0);
 __decorate([
+    type_graphql_1.Field(() => String),
     core_1.Property({ type: "text" }),
     __metadata("design:type", String)
 ], Player.prototype, "name", void 0);
 __decorate([
-    core_1.OneToMany(() => Game_1.Game, game => game.white),
+    core_1.OneToMany(() => Game_1.Game, (game) => game.white),
     __metadata("design:type", Object)
 ], Player.prototype, "whiteGames", void 0);
 __decorate([
-    core_1.OneToMany(() => Game_1.Game, game => game.black),
+    core_1.OneToMany(() => Game_1.Game, (game) => game.black),
     __metadata("design:type", Object)
 ], Player.prototype, "blackGames", void 0);
 __decorate([
+    type_graphql_1.Field(() => [type_graphql_1.Int]),
+    core_1.Property({ nullable: true }),
+    __metadata("design:type", Array)
+], Player.prototype, "games", void 0);
+__decorate([
+    type_graphql_1.Field(() => type_graphql_1.Int),
     core_1.Property({ nullable: true }),
     __metadata("design:type", Number)
 ], Player.prototype, "rating", void 0);
 __decorate([
+    type_graphql_1.Field(() => String),
     core_1.Property({ type: "text", nullable: true }),
     __metadata("design:type", String)
 ], Player.prototype, "profile", void 0);
 __decorate([
+    type_graphql_1.Field(() => [String]),
     core_1.Property({ nullable: true }),
     __metadata("design:type", Array)
 ], Player.prototype, "links", void 0);
 Player = __decorate([
+    type_graphql_1.ObjectType(),
     core_1.Entity()
 ], Player);
 exports.Player = Player;
