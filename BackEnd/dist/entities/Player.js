@@ -14,7 +14,8 @@ const core_1 = require("@mikro-orm/core");
 const Game_1 = require("./Game");
 let Player = class Player {
     constructor() {
-        this.games = new core_1.Collection(this);
+        this.whiteGames = new core_1.Collection(this);
+        this.blackGames = new core_1.Collection(this);
     }
 };
 __decorate([
@@ -26,19 +27,23 @@ __decorate([
     __metadata("design:type", String)
 ], Player.prototype, "name", void 0);
 __decorate([
-    core_1.OneToMany(() => Game_1.Game, game => [game.white, game.black]),
+    core_1.OneToMany(() => Game_1.Game, game => game.white),
     __metadata("design:type", Object)
-], Player.prototype, "games", void 0);
+], Player.prototype, "whiteGames", void 0);
 __decorate([
-    core_1.Property(),
+    core_1.OneToMany(() => Game_1.Game, game => game.black),
+    __metadata("design:type", Object)
+], Player.prototype, "blackGames", void 0);
+__decorate([
+    core_1.Property({ nullable: true }),
     __metadata("design:type", Number)
 ], Player.prototype, "rating", void 0);
 __decorate([
-    core_1.Property({ type: "text" }),
+    core_1.Property({ type: "text", nullable: true }),
     __metadata("design:type", String)
 ], Player.prototype, "profile", void 0);
 __decorate([
-    core_1.Property(),
+    core_1.Property({ nullable: true }),
     __metadata("design:type", Array)
 ], Player.prototype, "links", void 0);
 Player = __decorate([

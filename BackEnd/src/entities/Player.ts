@@ -16,20 +16,20 @@ export class Player {
   @Property({ type: "text" })
   name!: string;
 
-  // @OneToMany(()=> Game,game => game.id )
-  @OneToMany(()=> Game,game => [game.white,game.black] )
-  games =  new Collection<Game>(this);
+  @OneToMany(() => Game, game => game.white)
+  whiteGames = new Collection<Game>(this);
 
-  @Property()
+  @OneToMany(() => Game,game => game.black)
+  blackGames = new Collection<Game>(this);
+
+  @Property({ nullable: true })
   // fide rating
   rating?: number;
 
-  @Property({type:"text"})
+  @Property({ type: "text", nullable: true })
   // profile picture url
-  profile?:string;
+  profile?: string;
 
-  @Property()
-  links?:string[];
-
-
+  @Property({ nullable: true })
+  links?: string[];
 }

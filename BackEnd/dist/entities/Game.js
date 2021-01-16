@@ -23,11 +23,11 @@ __decorate([
     __metadata("design:type", String)
 ], Game.prototype, "pgn", void 0);
 __decorate([
-    core_1.ManyToOne(),
+    core_1.ManyToOne({ nullable: true }),
     __metadata("design:type", Player_1.Player)
 ], Game.prototype, "white", void 0);
 __decorate([
-    core_1.ManyToOne(),
+    core_1.ManyToOne({ nullable: true }),
     __metadata("design:type", Player_1.Player)
 ], Game.prototype, "black", void 0);
 Game = __decorate([

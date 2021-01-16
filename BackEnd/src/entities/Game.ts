@@ -20,11 +20,11 @@ export class Game {
 
 
   // define white and black player
-  @ManyToOne()
-  white: Player
+  @ManyToOne({nullable:true})
+  white?: Player
 
-  @ManyToOne()
-  black: Player
+  @ManyToOne({nullable:true})
+  black?: Player
 
   // @ManyToOne() // when you provide correct type hint, ORM will read it for you
   // author!: Author;

@@ -15,10 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@mikro-orm/core");
 const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 const Game_1 = require("./entities/Game");
+const Player_1 = require("./entities/Player");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
     yield orm.getMigrator().up();
-    const game = orm.em.create(Game_1.Game, { pgn: "waguan slimes" });
+    const magnus = orm.em.getReference(Player_1.Player, 1);
+    const hikaru = orm.em.getReference(Player_1.Player, 2);
+    const game = orm.em.create(Game_1.Game, { pgn: "waguan drillas", black: hikaru, white: magnus });
     yield orm.em.persistAndFlush(game);
 });
 main().catch((e) => console.log(e));
