@@ -9,11 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Game = void 0;
+exports.User = void 0;
 const core_1 = require("@mikro-orm/core");
 const type_graphql_1 = require("type-graphql");
-const Player_1 = require("./Player");
-let Game = class Game {
+let User = class User {
     constructor() {
         this.createdAt = new Date();
         this.updatedAt = new Date();
@@ -23,35 +22,29 @@ __decorate([
     type_graphql_1.Field(() => type_graphql_1.Int),
     core_1.PrimaryKey(),
     __metadata("design:type", Number)
-], Game.prototype, "id", void 0);
+], User.prototype, "id", void 0);
+__decorate([
+    type_graphql_1.Field(() => String),
+    core_1.Property({ type: "text", unique: true }),
+    __metadata("design:type", String)
+], User.prototype, "username", void 0);
+__decorate([
+    core_1.Property({ type: "text" }),
+    __metadata("design:type", String)
+], User.prototype, "password", void 0);
 __decorate([
     type_graphql_1.Field(() => String),
     core_1.Property({ type: "date" }),
     __metadata("design:type", Object)
-], Game.prototype, "createdAt", void 0);
+], User.prototype, "createdAt", void 0);
 __decorate([
     type_graphql_1.Field(() => String),
     core_1.Property({ type: "date", onUpdate: () => new Date() }),
     __metadata("design:type", Object)
-], Game.prototype, "updatedAt", void 0);
-__decorate([
-    type_graphql_1.Field(() => String),
-    core_1.Property({ type: "text" }),
-    __metadata("design:type", String)
-], Game.prototype, "pgn", void 0);
-__decorate([
-    type_graphql_1.Field(() => Player_1.Player),
-    core_1.ManyToOne({ nullable: true }),
-    __metadata("design:type", Player_1.Player)
-], Game.prototype, "white", void 0);
-__decorate([
-    type_graphql_1.Field(() => Player_1.Player),
-    core_1.ManyToOne({ nullable: true }),
-    __metadata("design:type", Player_1.Player)
-], Game.prototype, "black", void 0);
-Game = __decorate([
+], User.prototype, "updatedAt", void 0);
+User = __decorate([
     type_graphql_1.ObjectType(),
     core_1.Entity()
-], Game);
-exports.Game = Game;
-//# sourceMappingURL=Game.js.map
+], User);
+exports.User = User;
+//# sourceMappingURL=User.js.map

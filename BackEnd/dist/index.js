@@ -20,15 +20,37 @@ const apollo_server_express_1 = require("apollo-server-express");
 const type_graphql_1 = require("type-graphql");
 const GameResolver_1 = require("./resolvers/GameResolver");
 const PlayerResolver_1 = require("./resolvers/PlayerResolver");
+const UserResolver_1 = require("./resolvers/UserResolver");
+const express_session_1 = __importDefault(require("express-session"));
+const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
     yield orm.getMigrator().up();
     const app = express_1.default();
+    const conObject = {
+        user: 'ChessDB',
+        password: 'ChessDBQL',
+        host: 'localhost',
+        port: 5432,
+        database: 'ChessDB'
+    };
+    app.use(express_session_1.default({
+        name: "ch",
+        store: new (connect_pg_simple_1.default(express_session_1.default))({ conObject: conObject }),
+        secret: "session_pkey",
+        resave: false,
+        cookie: {
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: "lax",
+        },
+        saveUninitialized: false
+    }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
-            resolvers: [GameResolver_1.GameResovler, PlayerResolver_1.PlayerResovler],
+            resolvers: [GameResolver_1.GameResovler, PlayerResolver_1.PlayerResovler, UserResolver_1.UserResolver],
         }),
-        context: () => ({ em: orm.em }),
+        context: ({ req, res }) => ({ em: orm.em, req: req, res: res }),
     });
     apolloServer.applyMiddleware({ app });
     app.listen(4000, () => {

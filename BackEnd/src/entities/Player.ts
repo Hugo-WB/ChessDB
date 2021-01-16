@@ -2,8 +2,6 @@ import {
   Entity,
   PrimaryKey,
   Property,
-  ManyToOne,
-  ManyToMany,
   Collection,
   OneToMany,
 } from "@mikro-orm/core";
@@ -19,8 +17,17 @@ export class Player {
   id!: number;
 
   @Field(()=>String)
-  @Property({ type: "text" })
+  @Property({ type: "text"})
   name!: string;
+
+  @Field(()=>String)
+  @Property({type:"date"})
+  createdAt = new Date();
+
+  @Field(()=>String)
+  @Property({type:"date", onUpdate: ()=> new Date()})
+  updatedAt = new Date();
+
 
   @OneToMany(() => Game, (game) => game.white)
   whiteGames = new Collection<Game>(this);

@@ -15,6 +15,8 @@ const type_graphql_1 = require("type-graphql");
 const Game_1 = require("./Game");
 let Player = class Player {
     constructor() {
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
         this.whiteGames = new core_1.Collection(this);
         this.blackGames = new core_1.Collection(this);
     }
@@ -29,6 +31,16 @@ __decorate([
     core_1.Property({ type: "text" }),
     __metadata("design:type", String)
 ], Player.prototype, "name", void 0);
+__decorate([
+    type_graphql_1.Field(() => String),
+    core_1.Property({ type: "date" }),
+    __metadata("design:type", Object)
+], Player.prototype, "createdAt", void 0);
+__decorate([
+    type_graphql_1.Field(() => String),
+    core_1.Property({ type: "date", onUpdate: () => new Date() }),
+    __metadata("design:type", Object)
+], Player.prototype, "updatedAt", void 0);
 __decorate([
     core_1.OneToMany(() => Game_1.Game, (game) => game.white),
     __metadata("design:type", Object)

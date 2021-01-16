@@ -7,8 +7,9 @@ const Game_1 = require("./entities/Game");
 const Player_1 = require("./entities/Player");
 const constants_1 = require("./constants");
 const path_1 = __importDefault(require("path"));
+const User_1 = require("./entities/User");
 const config = {
-    entities: [Game_1.Game, Player_1.Player],
+    entities: [Game_1.Game, Player_1.Player, User_1.User],
     dbName: "ChessDB",
     type: "postgresql",
     debug: !constants_1.__prod__,
