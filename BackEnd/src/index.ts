@@ -6,6 +6,7 @@ import mikroConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
+import cors from "cors";
 
 // Resolvers:
 import { GameResovler } from "./resolvers/GameResolver";
@@ -23,19 +24,25 @@ const main = async () => {
 
   // Express:
   const app = express();
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+    })
+  );
 
   // Postgress session:
-    const conObject = {
-      user: 'ChessDB',
-      password: 'ChessDBQL',
-      host: 'localhost',
-      port: 5432,
-      database: 'ChessDB'
-    };
+  const conObject = {
+    user: "ChessDB",
+    password: "ChessDBQL",
+    host: "localhost",
+    port: 5432,
+    database: "ChessDB",
+  };
   app.use(
     session({
       name: "ch",
-      store: new (pgSession(session))({conObject:conObject}),
+      store: new (pgSession(session))({ conObject: conObject }),
       secret: "session_pkey",
       resave: false,
       cookie: {
@@ -47,7 +54,7 @@ const main = async () => {
         // only allow https:
         // secure:__prod__
       },
-      saveUninitialized:false
+      saveUninitialized: false,
     })
   );
 
@@ -59,7 +66,7 @@ const main = async () => {
     context: ({ req, res }) => ({ em: orm.em, req: req, res: res }),
   });
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, () => {
     console.log("Server started on localhost:4000");

@@ -18,6 +18,7 @@ const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 const express_1 = __importDefault(require("express"));
 const apollo_server_express_1 = require("apollo-server-express");
 const type_graphql_1 = require("type-graphql");
+const cors_1 = __importDefault(require("cors"));
 const GameResolver_1 = require("./resolvers/GameResolver");
 const PlayerResolver_1 = require("./resolvers/PlayerResolver");
 const UserResolver_1 = require("./resolvers/UserResolver");
@@ -27,12 +28,16 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
     yield orm.getMigrator().up();
     const app = express_1.default();
+    app.use(cors_1.default({
+        origin: "http://localhost:3000",
+        credentials: true,
+    }));
     const conObject = {
-        user: 'ChessDB',
-        password: 'ChessDBQL',
-        host: 'localhost',
+        user: "ChessDB",
+        password: "ChessDBQL",
+        host: "localhost",
         port: 5432,
-        database: 'ChessDB'
+        database: "ChessDB",
     };
     app.use(express_session_1.default({
         name: "ch",
@@ -44,7 +49,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             httpOnly: true,
             sameSite: "lax",
         },
-        saveUninitialized: false
+        saveUninitialized: false,
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
@@ -52,7 +57,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         }),
         context: ({ req, res }) => ({ em: orm.em, req: req, res: res }),
     });
-    apolloServer.applyMiddleware({ app });
+    apolloServer.applyMiddleware({ app, cors: false });
     app.listen(4000, () => {
         console.log("Server started on localhost:4000");
     });
