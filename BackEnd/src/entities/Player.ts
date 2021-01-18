@@ -27,10 +27,6 @@ export class Player {
   @OneToMany(() => Game, (game: Game) => game.black)
   blackGames: Game[];
 
-  @Field(() => [Int])
-  @Property()
-  games: number[];
-
   @Field(() => Int)
   @Property({ nullable: true })
   // fide rating

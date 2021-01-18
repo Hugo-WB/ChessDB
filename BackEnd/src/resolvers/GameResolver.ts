@@ -42,23 +42,14 @@ export class GameResovler {
     { em }: MyContext
   ): Promise<GameResponse> {
     try {
-      const whitePromise = em.findOneOrFail(Player, { id: whiteID });
-      const blackPromise = em.findOneOrFail(Player, { id: blackID });
       const whiteRef = em.getReference(Player, whiteID);
       const blackRef = em.getReference(Player, blackID);
-      const game:Game = em.create(Game, {
+      const game: Game = em.create(Game, {
         pgn: pgn,
         white: whiteRef,
         black: blackRef,
       });
       await em.persistAndFlush(game);
-      let [white, black]: [Player, Player] = await Promise.all([
-        whitePromise,
-        blackPromise,
-      ]);
-      white.games.push(game.id);
-      black.games.push(game.id);
-      await em.flush();
 
       return { game };
     } catch (error) {
@@ -94,6 +85,13 @@ export class GameResovler {
     if (!game) {
       return null;
     }
+    // let [white, black] = await Promise.all([
+    //   em.findOneOrFail(Player, { id: game.white.id }),
+    //   em.findOneOrFail(Player, { id: game.black.id }),
+    // ]);
+    // white.games.slice(white.games.indexOf(game.id));
+    // black.games.slice(black.games.indexOf(game.id));
+    // await em.flush();
     await em.nativeDelete(Game, { id });
     return game;
   }

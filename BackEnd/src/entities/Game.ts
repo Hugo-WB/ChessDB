@@ -28,4 +28,5 @@ export class Game {
   @Field(() => Player)
   @ManyToOne()
   black!: Player;
+
 }

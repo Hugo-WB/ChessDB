@@ -48,8 +48,6 @@ let GameResovler = class GameResovler {
     createGame(pgn, whiteID, blackID, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const whitePromise = em.findOneOrFail(Player_1.Player, { id: whiteID });
-                const blackPromise = em.findOneOrFail(Player_1.Player, { id: blackID });
                 const whiteRef = em.getReference(Player_1.Player, whiteID);
                 const blackRef = em.getReference(Player_1.Player, blackID);
                 const game = em.create(Game_1.Game, {
@@ -58,13 +56,6 @@ let GameResovler = class GameResovler {
                     black: blackRef,
                 });
                 yield em.persistAndFlush(game);
-                let [white, black] = yield Promise.all([
-                    whitePromise,
-                    blackPromise,
-                ]);
-                white.games.push(game.id);
-                black.games.push(game.id);
-                yield em.flush();
                 return { game };
             }
             catch (error) {

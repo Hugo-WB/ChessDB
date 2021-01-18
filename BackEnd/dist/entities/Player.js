@@ -48,11 +48,6 @@ __decorate([
     __metadata("design:type", Array)
 ], Player.prototype, "blackGames", void 0);
 __decorate([
-    type_graphql_1.Field(() => [type_graphql_1.Int]),
-    core_1.Property(),
-    __metadata("design:type", Array)
-], Player.prototype, "games", void 0);
-__decorate([
     type_graphql_1.Field(() => type_graphql_1.Int),
     core_1.Property({ nullable: true }),
     __metadata("design:type", Number)
