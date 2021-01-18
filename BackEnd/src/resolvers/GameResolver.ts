@@ -24,7 +24,10 @@ class GameResponse {
 export class GameResovler {
   // GET
   @Query(() => [Game])
-  games(@Ctx() { em }: MyContext): Promise<Game[]> {
+  games(
+    @Arg("playerId",{nullable:true}) playerId:number,
+    // @Arg("")
+    @Ctx() { em }: MyContext): Promise<Game[]> {
     return em.find(Game, {});
   }
 

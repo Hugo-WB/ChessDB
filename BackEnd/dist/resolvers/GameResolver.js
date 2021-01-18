@@ -39,7 +39,7 @@ GameResponse = __decorate([
     type_graphql_1.ObjectType()
 ], GameResponse);
 let GameResovler = class GameResovler {
-    games({ em }) {
+    games(playerId, { em }) {
         return em.find(Game_1.Game, {});
     }
     game(id, { em }) {
@@ -89,9 +89,10 @@ let GameResovler = class GameResovler {
 };
 __decorate([
     type_graphql_1.Query(() => [Game_1.Game]),
-    __param(0, type_graphql_1.Ctx()),
+    __param(0, type_graphql_1.Arg("playerId", { nullable: true })),
+    __param(1, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "games", null);
 __decorate([
