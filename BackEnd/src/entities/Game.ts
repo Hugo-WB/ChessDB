@@ -22,10 +22,10 @@ export class Game {
   pgn!: string;
 
   @Field(() => Player)
-  @ManyToOne({ nullable: true })
-  white?: Player;
+  @ManyToOne()
+  white!: Player;
 
   @Field(() => Player)
-  @ManyToOne({ nullable: true })
-  black?: Player;
+  @ManyToOne()
+  black!: Player;
 }

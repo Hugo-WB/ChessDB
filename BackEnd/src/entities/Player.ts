@@ -1,55 +1,47 @@
-import {
-  Entity,
-  PrimaryKey,
-  Property,
-  Collection,
-  OneToMany,
-} from "@mikro-orm/core";
+import { Entity, PrimaryKey, Property, OneToMany, Collection } from "@mikro-orm/core";
 import { Field, Int, ObjectType } from "type-graphql";
 import { Game } from "./Game";
-
 
 @ObjectType()
 @Entity()
 export class Player {
-  @Field(()=>Int)
+  @Field(() => Int)
   @PrimaryKey()
   id!: number;
 
-  @Field(()=>String)
-  @Property({ type: "text"})
+  @Field(() => String)
+  @Property({ type: "text" })
   name!: string;
 
-  @Field(()=>String)
-  @Property({type:"date"})
+  @Field(() => String)
+  @Property({ type: "date" })
   createdAt = new Date();
 
-  @Field(()=>String)
-  @Property({type:"date", onUpdate: ()=> new Date()})
+  @Field(() => String)
+  @Property({ type: "date", onUpdate: () => new Date() })
   updatedAt = new Date();
 
+  @OneToMany(() => Game, (game: Game) => game.white)
+  whiteGames: Game[];
 
-  @OneToMany(() => Game, (game) => game.white)
-  whiteGames = new Collection<Game>(this);
+  @OneToMany(() => Game, (game: Game) => game.black)
+  blackGames: Game[];
 
-  @OneToMany(() => Game, (game) => game.black)
-  blackGames = new Collection<Game>(this);
+  @Field(() => [Int])
+  @Property()
+  games: number[];
 
-  @Field(()=>[Int])
-  @Property({ nullable: true })
-  games?: number[];
-
-  @Field(()=>Int)
+  @Field(() => Int)
   @Property({ nullable: true })
   // fide rating
   rating?: number;
 
-  @Field(()=>String)
+  @Field(() => String)
   @Property({ type: "text", nullable: true })
   // profile picture url
   profile?: string;
 
-  @Field(()=>[String])
+  @Field(() => [String])
   @Property({ nullable: true })
   links?: string[];
 }

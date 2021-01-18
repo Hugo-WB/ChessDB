@@ -24,6 +24,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameResovler = void 0;
 const Game_1 = require("../entities/Game");
 const type_graphql_1 = require("type-graphql");
+const Player_1 = require("../entities/Player");
+let GameResponse = class GameResponse {
+};
+__decorate([
+    type_graphql_1.Field(() => String, { nullable: true }),
+    __metadata("design:type", String)
+], GameResponse.prototype, "error", void 0);
+__decorate([
+    type_graphql_1.Field(() => Game_1.Game, { nullable: true }),
+    __metadata("design:type", Game_1.Game)
+], GameResponse.prototype, "game", void 0);
+GameResponse = __decorate([
+    type_graphql_1.ObjectType()
+], GameResponse);
 let GameResovler = class GameResovler {
     games({ em }) {
         return em.find(Game_1.Game, {});
@@ -31,11 +45,31 @@ let GameResovler = class GameResovler {
     game(id, { em }) {
         return em.findOne(Game_1.Game, { id });
     }
-    createGame(pgn, { em }) {
+    createGame(pgn, whiteID, blackID, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const game = em.create(Game_1.Game, { pgn: pgn });
-            yield em.persistAndFlush(game);
-            return game;
+            try {
+                const whitePromise = em.findOneOrFail(Player_1.Player, { id: whiteID });
+                const blackPromise = em.findOneOrFail(Player_1.Player, { id: blackID });
+                const whiteRef = em.getReference(Player_1.Player, whiteID);
+                const blackRef = em.getReference(Player_1.Player, blackID);
+                const game = em.create(Game_1.Game, {
+                    pgn: pgn,
+                    white: whiteRef,
+                    black: blackRef,
+                });
+                yield em.persistAndFlush(game);
+                let [white, black] = yield Promise.all([
+                    whitePromise,
+                    blackPromise,
+                ]);
+                white.games.push(game.id);
+                black.games.push(game.id);
+                yield em.flush();
+                return { game };
+            }
+            catch (error) {
+                return { error: error };
+            }
         });
     }
     updateGame(id, pgn, { em }) {
@@ -77,11 +111,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "game", null);
 __decorate([
-    type_graphql_1.Mutation(() => Game_1.Game),
+    type_graphql_1.Mutation(() => GameResponse),
     __param(0, type_graphql_1.Arg("pgn")),
-    __param(1, type_graphql_1.Ctx()),
+    __param(1, type_graphql_1.Arg("whiteID")),
+    __param(2, type_graphql_1.Arg("blackID")),
+    __param(3, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Number, Number, Object]),
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "createGame", null);
 __decorate([

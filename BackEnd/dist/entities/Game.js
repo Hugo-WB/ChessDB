@@ -41,12 +41,12 @@ __decorate([
 ], Game.prototype, "pgn", void 0);
 __decorate([
     type_graphql_1.Field(() => Player_1.Player),
-    core_1.ManyToOne({ nullable: true }),
+    core_1.ManyToOne(),
     __metadata("design:type", Player_1.Player)
 ], Game.prototype, "white", void 0);
 __decorate([
     type_graphql_1.Field(() => Player_1.Player),
-    core_1.ManyToOne({ nullable: true }),
+    core_1.ManyToOne(),
     __metadata("design:type", Player_1.Player)
 ], Game.prototype, "black", void 0);
 Game = __decorate([

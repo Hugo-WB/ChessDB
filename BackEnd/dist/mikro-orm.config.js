@@ -18,6 +18,7 @@ const config = {
     migrations: {
         path: path_1.default.join(__dirname, "./migrations"),
         pattern: /^[\w-]+\d+\.[jt]s$/,
+        dropTables: false,
     },
 };
 exports.default = config;

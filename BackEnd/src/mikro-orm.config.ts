@@ -15,6 +15,7 @@ const config: Parameters<typeof MikroORM.init>[0] = {
   migrations: {
     path: path.join(__dirname, "./migrations"),
     pattern: /^[\w-]+\d+\.[jt]s$/,
+    dropTables:false,
   },
 };
 export default config;

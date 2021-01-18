@@ -17,8 +17,6 @@ let Player = class Player {
     constructor() {
         this.createdAt = new Date();
         this.updatedAt = new Date();
-        this.whiteGames = new core_1.Collection(this);
-        this.blackGames = new core_1.Collection(this);
     }
 };
 __decorate([
@@ -43,15 +41,15 @@ __decorate([
 ], Player.prototype, "updatedAt", void 0);
 __decorate([
     core_1.OneToMany(() => Game_1.Game, (game) => game.white),
-    __metadata("design:type", Object)
+    __metadata("design:type", Array)
 ], Player.prototype, "whiteGames", void 0);
 __decorate([
     core_1.OneToMany(() => Game_1.Game, (game) => game.black),
-    __metadata("design:type", Object)
+    __metadata("design:type", Array)
 ], Player.prototype, "blackGames", void 0);
 __decorate([
     type_graphql_1.Field(() => [type_graphql_1.Int]),
-    core_1.Property({ nullable: true }),
+    core_1.Property(),
     __metadata("design:type", Array)
 ], Player.prototype, "games", void 0);
 __decorate([

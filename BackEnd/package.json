@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc .",
-    "dev": "nodemon dist/index.js",
+    "dev": "echo TS WATCH && nodemon dist/index.js",
     "watch": "tsc -w",
-    "migrate": "npx mikro-orm migration:create"
+    "migrate": "echo TS WATCH && npx mikro-orm migration:create"
   },
   "keywords": [],
   "author": "",

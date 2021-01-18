@@ -1,6 +1,24 @@
 import { Game } from "../entities/Game";
 import { MyContext } from "../types";
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Ctx,
+  Field,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
+} from "type-graphql";
+import { Player } from "../entities/Player";
+import { Collection } from "@mikro-orm/core";
+
+@ObjectType()
+class GameResponse {
+  @Field(() => String, { nullable: true })
+  error?: string;
+  @Field(() => Game, { nullable: true })
+  game?: Game;
+}
 
 @Resolver(Game)
 export class GameResovler {
@@ -15,25 +33,44 @@ export class GameResovler {
     return em.findOne(Game, { id });
   }
 
-  @Mutation(() => Game)
+  @Mutation(() => GameResponse)
   async createGame(
     @Arg("pgn") pgn: string,
-    // @Arg("white", () => Player) white: Player,
-    // @Arg("black", () => Player) black: Player,
+    @Arg("whiteID") whiteID: number,
+    @Arg("blackID") blackID: number,
     @Ctx()
     { em }: MyContext
-  ): Promise<Game> {
-    const game = em.create(Game, { pgn: pgn });
-    await em.persistAndFlush(game);
-    return game;
+  ): Promise<GameResponse> {
+    try {
+      const whitePromise = em.findOneOrFail(Player, { id: whiteID });
+      const blackPromise = em.findOneOrFail(Player, { id: blackID });
+      const whiteRef = em.getReference(Player, whiteID);
+      const blackRef = em.getReference(Player, blackID);
+      const game:Game = em.create(Game, {
+        pgn: pgn,
+        white: whiteRef,
+        black: blackRef,
+      });
+      await em.persistAndFlush(game);
+      let [white, black]: [Player, Player] = await Promise.all([
+        whitePromise,
+        blackPromise,
+      ]);
+      white.games.push(game.id);
+      black.games.push(game.id);
+      await em.flush();
+
+      return { game };
+    } catch (error) {
+      // return { error: "Error creating, make sure played id is correct!" };
+      return { error: error };
+    }
   }
 
   @Mutation(() => Game, { nullable: true })
   async updateGame(
     @Arg("id") id: number,
     @Arg("pgn", { nullable: true }) pgn: string,
-    // @Arg("white", () => Player,{nullable:true}) white: Player,
-    // @Arg("black", () => Player,{nullable:true}) black: Player,
     @Ctx()
     { em }: MyContext
   ): Promise<Game | null> {

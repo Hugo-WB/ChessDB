@@ -1,6 +1,7 @@
 import { Player } from "../entities/Player";
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { MyContext } from "src/types";
+import { Game } from "../entities/Game";
 
 @Resolver()
 export class PlayerResovler {
@@ -21,9 +22,25 @@ export class PlayerResovler {
   async createPlayer(
     @Arg("name") name: string,
     @Arg("rating") rating: number,
+    @Arg("games",()=>[Int] ,{ nullable: true }) gameIDS: number[],
     @Ctx() { em }: MyContext
   ): Promise<Player> {
-    const player = em.create(Player, { name: name, rating: rating });
+    let gameRefs = gameIDS
+      .map((id) => {
+        try {
+          return em.getReference(Game, id);
+        } catch {
+          return undefined;
+        }
+      })
+      .filter((e) => {
+        return Boolean(e)
+      });
+    const player = em.create(Player, {
+      name: name,
+      rating: rating,
+      games: gameRefs,
+    });
     await em.persistAndFlush(player);
     return player;
   }
