@@ -17,41 +17,24 @@ import { BasicSearch, AdvancedSearch } from "./types";
 // Components:
 import SearchForm from "../components/SearchForm";
 import Results from "../components/Results";
+import { GET_GAMES } from "../graphql/queries";
+import { useQuery } from "@apollo/client";
 
 
 interface Props {}
 
-interface State {
-  search: BasicSearch | AdvancedSearch;
-  renderResults: boolean;
-}
-const initialState: State = {
-  search: {
-    firstMoves: "",
-    player: "",
-  },
-  renderResults: false,
-};
-
 const index = (props: Props) => {
-  const [state, setState] = useState(initialState);
-  let renderResults = (search: BasicSearch | AdvancedSearch) => {
-    setState({
-      ...state,
-      renderResults: true,
-      search: search,
-    });
-  };
+
+  const {loading,error,data} = useQuery(GET_GAMES);
+  if (loading) return "Loading..."
   return (
     <>
       <Pane>
         <Heading>ChessDB</Heading>
       </Pane>
       <Pane>
-        <SearchForm renderResults={renderResults} />
+        {data.games.map((game)=>game.pgn)}
       </Pane>
-      {/* Results */}
-      {state.renderResults ? <Results search={state.search} /> : <div />}
     </>
   );
 };
