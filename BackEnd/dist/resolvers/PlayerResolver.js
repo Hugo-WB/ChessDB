@@ -25,8 +25,16 @@ exports.PlayerResovler = void 0;
 const Player_1 = require("../entities/Player");
 const type_graphql_1 = require("type-graphql");
 let PlayerResovler = class PlayerResovler {
-    players({ em }) {
-        return em.find(Player_1.Player, {});
+    players(id, name, { em }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let results = yield em
+                .createQueryBuilder(Player_1.Player)
+                .getKnexQuery()
+                .where(Object.assign({}, id === undefined ? null : { id }, name === undefined ? null : { name }));
+            let players = results.map((player) => em.map(Player_1.Player, player));
+            console.log;
+            return players;
+        });
     }
     player(id, { em }) {
         return em.findOne(Player_1.Player, { id });
@@ -66,9 +74,11 @@ let PlayerResovler = class PlayerResovler {
 };
 __decorate([
     type_graphql_1.Query(() => [Player_1.Player]),
-    __param(0, type_graphql_1.Ctx()),
+    __param(0, type_graphql_1.Arg("id", { nullable: true })),
+    __param(1, type_graphql_1.Arg("name", { nullable: true })),
+    __param(2, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Number, String, Object]),
     __metadata("design:returntype", Promise)
 ], PlayerResovler.prototype, "players", null);
 __decorate([

@@ -2,12 +2,33 @@ import { Player } from "../entities/Player";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { MyContext } from "src/types";
 import { Game } from "../entities/Game";
+import { EntityManager, QueryBuilder } from "@mikro-orm/postgresql";
 
 @Resolver()
 export class PlayerResovler {
   @Query(() => [Player])
-  players(@Ctx() { em }: MyContext): Promise<Player[]> {
-    return em.find(Player, {});
+  async players(
+    @Arg("id", { nullable: true }) id: number,
+    @Arg("name", { nullable: true }) name: string,
+    // @Arg("maxRating", { nullable: true }) maxRating: number,
+    // @Arg("minRating", { nullable: true }) minRating: number,
+    @Ctx() { em }: MyContext
+  ): Promise<Player[]> {
+    let results = await (em as EntityManager)
+      .createQueryBuilder(Player)
+      .getKnexQuery()
+      .where(
+        Object.assign(
+          {},
+          id === undefined ? null : { id },
+          name === undefined ? null : { name }
+        )
+      );
+    let players: Player[] = results.map((player: any) =>
+      em.map(Player, player)
+    );
+    console.log;
+    return players;
   }
 
   @Query(() => Player, { nullable: true })

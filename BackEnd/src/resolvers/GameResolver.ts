@@ -27,32 +27,36 @@ export class GameResovler {
   // GET
   @Query(() => [Game])
   async games(
-    @Arg("gameId", { nullable: true }) gameId: number,
+    @Arg("id", { nullable: true }) gameId: number,
     @Arg("playerId", { nullable: true }) playerId: number,
-    @Arg("gameLength",()=>[Int],{nullable:true}) gameLength:[number,number],
+    @Arg("maxLength", { nullable: true }) maxLength: number,
+    @Arg("minLength", { nullable: true }) minLength: number,
+    @Arg("opening", { nullable: true }) opening: string,
     @Ctx() { em }: MyContext
   ): Promise<Game[]> {
     let results = await (em as EntityManager)
       .createQueryBuilder(Game)
       .getKnexQuery()
-      .where((builder) => {
-        if (gameId != undefined) {
-          builder.where({ id: gameId });
-        }
-      })
+      .where(
+        Object.assign(
+          {},
+          gameId === undefined ? null : { id: gameId },
+          opening === undefined ? null : { opening: opening }
+        )
+      )
       .andWhere((builder) => {
-        if (playerId != undefined) {
+        if (playerId) {
           builder.where({ white_id: playerId }).orWhere({ black_id: playerId });
         }
-      })
-      .andWhere(builder=>{
-        if(gameLength != undefined){
-          builder.where({})
+        if (maxLength) {
+          builder.where("maxLength", ">=", "length");
         }
-      })
-      ;
-    let games:Game[]= results.map((result:any)=>em.map(Game,result))
-    return games
+        if (minLength) {
+          builder.where("minLength", "<=", "length");
+        }
+      });
+    let games: Game[] = results.map((result: any) => em.map(Game, result));
+    return games;
     // if (gameId != undefined) {
     //   return em.find(Game, { id: gameId });
     // }
@@ -64,6 +68,12 @@ export class GameResovler {
     @Arg("pgn") pgn: string,
     @Arg("whiteID") whiteID: number,
     @Arg("blackID") blackID: number,
+    @Arg("blackMoves",()=>[String]) blackMoves:string[],
+    @Arg("whiteMoves",()=>[String]) whiteMoves:string[],
+    @Arg("opening",()=>String) opening:string,
+    @Arg("length",()=>Int) length:number,
+    @Arg("playDate",()=>String) playDate:string,
+    @Arg("whiteWin",()=>Boolean) whiteWin:boolean,
     @Ctx()
     { em }: MyContext
   ): Promise<GameResponse> {
@@ -74,6 +84,12 @@ export class GameResovler {
         pgn: pgn,
         white: whiteRef,
         black: blackRef,
+        blackMoves:blackMoves,
+        whiteMoves:whiteMoves,
+        opening:opening,
+        length:length,
+        playedAt:playDate,
+        whiteWin:whiteWin
       });
       await em.persistAndFlush(game);
 
@@ -111,13 +127,6 @@ export class GameResovler {
     if (!game) {
       return null;
     }
-    // let [white, black] = await Promise.all([
-    //   em.findOneOrFail(Player, { id: game.white.id }),
-    //   em.findOneOrFail(Player, { id: game.black.id }),
-    // ]);
-    // white.games.slice(white.games.indexOf(game.id));
-    // black.games.slice(black.games.indexOf(game.id));
-    // await em.flush();
     await em.nativeDelete(Game, { id });
     return game;
   }

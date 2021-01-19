@@ -39,31 +39,28 @@ GameResponse = __decorate([
     type_graphql_1.ObjectType()
 ], GameResponse);
 let GameResovler = class GameResovler {
-    games(gameId, playerId, gameLength, { em }) {
+    games(gameId, playerId, maxLength, minLength, opening, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             let results = yield em
                 .createQueryBuilder(Game_1.Game)
                 .getKnexQuery()
-                .where((builder) => {
-                if (gameId != undefined) {
-                    builder.where({ id: gameId });
-                }
-            })
+                .where(Object.assign({}, gameId === undefined ? null : { id: gameId }, opening === undefined ? null : { opening: opening }))
                 .andWhere((builder) => {
-                if (playerId != undefined) {
+                if (playerId) {
                     builder.where({ white_id: playerId }).orWhere({ black_id: playerId });
                 }
-            })
-                .andWhere(builder => {
-                if (gameLength != undefined) {
-                    builder.where({});
+                if (maxLength) {
+                    builder.where("maxLength", ">=", "length");
+                }
+                if (minLength) {
+                    builder.where("minLength", "<=", "length");
                 }
             });
             let games = results.map((result) => em.map(Game_1.Game, result));
             return games;
         });
     }
-    createGame(pgn, whiteID, blackID, { em }) {
+    createGame(pgn, whiteID, blackID, blackMoves, whiteMoves, opening, length, playDate, whiteWin, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const whiteRef = em.getReference(Player_1.Player, whiteID);
@@ -72,6 +69,12 @@ let GameResovler = class GameResovler {
                     pgn: pgn,
                     white: whiteRef,
                     black: blackRef,
+                    blackMoves: blackMoves,
+                    whiteMoves: whiteMoves,
+                    opening: opening,
+                    length: length,
+                    playedAt: playDate,
+                    whiteWin: whiteWin
                 });
                 yield em.persistAndFlush(game);
                 return { game };
@@ -107,12 +110,14 @@ let GameResovler = class GameResovler {
 };
 __decorate([
     type_graphql_1.Query(() => [Game_1.Game]),
-    __param(0, type_graphql_1.Arg("gameId", { nullable: true })),
+    __param(0, type_graphql_1.Arg("id", { nullable: true })),
     __param(1, type_graphql_1.Arg("playerId", { nullable: true })),
-    __param(2, type_graphql_1.Arg("gameLength", () => [type_graphql_1.Int], { nullable: true })),
-    __param(3, type_graphql_1.Ctx()),
+    __param(2, type_graphql_1.Arg("maxLength", { nullable: true })),
+    __param(3, type_graphql_1.Arg("minLength", { nullable: true })),
+    __param(4, type_graphql_1.Arg("opening", { nullable: true })),
+    __param(5, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, Array, Object]),
+    __metadata("design:paramtypes", [Number, Number, Number, Number, String, Object]),
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "games", null);
 __decorate([
@@ -120,9 +125,15 @@ __decorate([
     __param(0, type_graphql_1.Arg("pgn")),
     __param(1, type_graphql_1.Arg("whiteID")),
     __param(2, type_graphql_1.Arg("blackID")),
-    __param(3, type_graphql_1.Ctx()),
+    __param(3, type_graphql_1.Arg("blackMoves", () => [String])),
+    __param(4, type_graphql_1.Arg("whiteMoves", () => [String])),
+    __param(5, type_graphql_1.Arg("opening", () => String)),
+    __param(6, type_graphql_1.Arg("length", () => type_graphql_1.Int)),
+    __param(7, type_graphql_1.Arg("playDate", () => String)),
+    __param(8, type_graphql_1.Arg("whiteWin", () => Boolean)),
+    __param(9, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number, Number, Object]),
+    __metadata("design:paramtypes", [String, Number, Number, Array, Array, String, Number, String, Boolean, Object]),
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "createGame", null);
 __decorate([
