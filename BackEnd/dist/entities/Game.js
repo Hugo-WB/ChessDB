@@ -15,6 +15,7 @@ const type_graphql_1 = require("type-graphql");
 const Player_1 = require("./Player");
 let Game = class Game {
     constructor() {
+        this.playedAt = new Date();
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
@@ -24,6 +25,11 @@ __decorate([
     core_1.PrimaryKey(),
     __metadata("design:type", Number)
 ], Game.prototype, "id", void 0);
+__decorate([
+    type_graphql_1.Field(() => String),
+    core_1.Property({ type: "date" }),
+    __metadata("design:type", Object)
+], Game.prototype, "playedAt", void 0);
 __decorate([
     type_graphql_1.Field(() => String),
     core_1.Property({ type: "date" }),
@@ -49,6 +55,31 @@ __decorate([
     core_1.ManyToOne(),
     __metadata("design:type", Player_1.Player)
 ], Game.prototype, "black", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    core_1.Property({ type: "boolean" }),
+    __metadata("design:type", Boolean)
+], Game.prototype, "whiteWin", void 0);
+__decorate([
+    type_graphql_1.Field(() => type_graphql_1.Int),
+    core_1.Property(),
+    __metadata("design:type", Number)
+], Game.prototype, "length", void 0);
+__decorate([
+    type_graphql_1.Field(() => String),
+    core_1.Property({ type: "text" }),
+    __metadata("design:type", String)
+], Game.prototype, "opening", void 0);
+__decorate([
+    type_graphql_1.Field(() => [String]),
+    core_1.Property(),
+    __metadata("design:type", Array)
+], Game.prototype, "whiteMoves", void 0);
+__decorate([
+    type_graphql_1.Field(() => [String]),
+    core_1.Property(),
+    __metadata("design:type", Array)
+], Game.prototype, "blackMoves", void 0);
 Game = __decorate([
     type_graphql_1.ObjectType(),
     core_1.Entity()

@@ -24,7 +24,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlayerResovler = void 0;
 const Player_1 = require("../entities/Player");
 const type_graphql_1 = require("type-graphql");
-const Game_1 = require("../entities/Game");
 let PlayerResovler = class PlayerResovler {
     players({ em }) {
         return em.find(Player_1.Player, {});
@@ -32,24 +31,11 @@ let PlayerResovler = class PlayerResovler {
     player(id, { em }) {
         return em.findOne(Player_1.Player, { id });
     }
-    createPlayer(name, rating, gameIDS, { em }) {
+    createPlayer(name, rating, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
-            let gameRefs = gameIDS
-                .map((id) => {
-                try {
-                    return em.getReference(Game_1.Game, id);
-                }
-                catch (_a) {
-                    return undefined;
-                }
-            })
-                .filter((e) => {
-                return Boolean(e);
-            });
             const player = em.create(Player_1.Player, {
                 name: name,
                 rating: rating,
-                games: gameRefs,
             });
             yield em.persistAndFlush(player);
             return player;
@@ -97,10 +83,9 @@ __decorate([
     type_graphql_1.Mutation(() => Player_1.Player, { nullable: true }),
     __param(0, type_graphql_1.Arg("name")),
     __param(1, type_graphql_1.Arg("rating")),
-    __param(2, type_graphql_1.Arg("games", () => [type_graphql_1.Int], { nullable: true })),
-    __param(3, type_graphql_1.Ctx()),
+    __param(2, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number, Array, Object]),
+    __metadata("design:paramtypes", [String, Number, Object]),
     __metadata("design:returntype", Promise)
 ], PlayerResovler.prototype, "createPlayer", null);
 __decorate([

@@ -4,13 +4,15 @@ import {
   Arg,
   Ctx,
   Field,
+  Int,
   Mutation,
   ObjectType,
   Query,
   Resolver,
 } from "type-graphql";
 import { Player } from "../entities/Player";
-import { Collection } from "@mikro-orm/core";
+import { Collection, Filter } from "@mikro-orm/core";
+import { EntityManager } from "@mikro-orm/postgresql";
 
 @ObjectType()
 class GameResponse {
@@ -24,16 +26,37 @@ class GameResponse {
 export class GameResovler {
   // GET
   @Query(() => [Game])
-  games(
-    @Arg("playerId",{nullable:true}) playerId:number,
-    // @Arg("")
-    @Ctx() { em }: MyContext): Promise<Game[]> {
-    return em.find(Game, {});
-  }
-
-  @Query(() => Game, { nullable: true })
-  game(@Arg("id") id: number, @Ctx() { em }: MyContext): Promise<Game | null> {
-    return em.findOne(Game, { id });
+  async games(
+    @Arg("gameId", { nullable: true }) gameId: number,
+    @Arg("playerId", { nullable: true }) playerId: number,
+    @Arg("gameLength",()=>[Int],{nullable:true}) gameLength:[number,number],
+    @Ctx() { em }: MyContext
+  ): Promise<Game[]> {
+    let results = await (em as EntityManager)
+      .createQueryBuilder(Game)
+      .getKnexQuery()
+      .where((builder) => {
+        if (gameId != undefined) {
+          builder.where({ id: gameId });
+        }
+      })
+      .andWhere((builder) => {
+        if (playerId != undefined) {
+          builder.where({ white_id: playerId }).orWhere({ black_id: playerId });
+        }
+      })
+      .andWhere(builder=>{
+        if(gameLength != undefined){
+          builder.where({})
+        }
+      })
+      ;
+    let games:Game[]= results.map((result:any)=>em.map(Game,result))
+    return games
+    // if (gameId != undefined) {
+    //   return em.find(Game, { id: gameId });
+    // }
+    // return em.find(Game, {}, {});
   }
 
   @Mutation(() => GameResponse)

@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property, ManyToOne } from "@mikro-orm/core";
+import { Entity, PrimaryKey, Property, ManyToOne, ArrayType } from "@mikro-orm/core";
 import { Field, Int, ObjectType } from "type-graphql";
 import { Player } from "./Player";
 
@@ -8,6 +8,10 @@ export class Game {
   @Field(() => Int)
   @PrimaryKey()
   id!: number;
+
+  @Field(()=>String)
+  @Property({type:"date"})
+  playedAt = new Date();
 
   @Field(() => String)
   @Property({ type: "date" })
@@ -29,4 +33,23 @@ export class Game {
   @ManyToOne()
   black!: Player;
 
+  @Field()
+  @Property({type:"boolean"})
+  whiteWin!:boolean;
+
+  @Field(() => Int)
+  @Property()
+  length!: number;
+
+  @Field(() => String)
+  @Property({ type: "text" })
+  opening!: string;
+
+  @Field(()=>[String])
+  @Property()
+  whiteMoves:string[];
+
+  @Field(()=>[String])
+  @Property()
+  blackMoves:string[]
 }

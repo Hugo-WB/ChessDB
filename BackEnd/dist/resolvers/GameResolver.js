@@ -39,11 +39,29 @@ GameResponse = __decorate([
     type_graphql_1.ObjectType()
 ], GameResponse);
 let GameResovler = class GameResovler {
-    games(playerId, { em }) {
-        return em.find(Game_1.Game, {});
-    }
-    game(id, { em }) {
-        return em.findOne(Game_1.Game, { id });
+    games(gameId, playerId, gameLength, { em }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let results = yield em
+                .createQueryBuilder(Game_1.Game)
+                .getKnexQuery()
+                .where((builder) => {
+                if (gameId != undefined) {
+                    builder.where({ id: gameId });
+                }
+            })
+                .andWhere((builder) => {
+                if (playerId != undefined) {
+                    builder.where({ white_id: playerId }).orWhere({ black_id: playerId });
+                }
+            })
+                .andWhere(builder => {
+                if (gameLength != undefined) {
+                    builder.where({});
+                }
+            });
+            let games = results.map((result) => em.map(Game_1.Game, result));
+            return games;
+        });
     }
     createGame(pgn, whiteID, blackID, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -89,19 +107,14 @@ let GameResovler = class GameResovler {
 };
 __decorate([
     type_graphql_1.Query(() => [Game_1.Game]),
-    __param(0, type_graphql_1.Arg("playerId", { nullable: true })),
-    __param(1, type_graphql_1.Ctx()),
+    __param(0, type_graphql_1.Arg("gameId", { nullable: true })),
+    __param(1, type_graphql_1.Arg("playerId", { nullable: true })),
+    __param(2, type_graphql_1.Arg("gameLength", () => [type_graphql_1.Int], { nullable: true })),
+    __param(3, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number, Number, Array, Object]),
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "games", null);
-__decorate([
-    type_graphql_1.Query(() => Game_1.Game, { nullable: true }),
-    __param(0, type_graphql_1.Arg("id")), __param(1, type_graphql_1.Ctx()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
-    __metadata("design:returntype", Promise)
-], GameResovler.prototype, "game", null);
 __decorate([
     type_graphql_1.Mutation(() => GameResponse),
     __param(0, type_graphql_1.Arg("pgn")),

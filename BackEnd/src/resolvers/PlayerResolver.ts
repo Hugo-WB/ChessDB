@@ -22,24 +22,11 @@ export class PlayerResovler {
   async createPlayer(
     @Arg("name") name: string,
     @Arg("rating") rating: number,
-    @Arg("games",()=>[Int] ,{ nullable: true }) gameIDS: number[],
     @Ctx() { em }: MyContext
   ): Promise<Player> {
-    let gameRefs = gameIDS
-      .map((id) => {
-        try {
-          return em.getReference(Game, id);
-        } catch {
-          return undefined;
-        }
-      })
-      .filter((e) => {
-        return Boolean(e)
-      });
     const player = em.create(Player, {
       name: name,
       rating: rating,
-      games: gameRefs,
     });
     await em.persistAndFlush(player);
     return player;
