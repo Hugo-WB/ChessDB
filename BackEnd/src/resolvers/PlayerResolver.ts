@@ -31,14 +31,6 @@ export class PlayerResovler {
     return players;
   }
 
-  @Query(() => Player, { nullable: true })
-  player(
-    @Arg("id") id: number,
-    @Ctx() { em }: MyContext
-  ): Promise<Player | null> {
-    return em.findOne(Player, { id });
-  }
-
   @Mutation(() => Player, { nullable: true })
   async createPlayer(
     @Arg("name") name: string,

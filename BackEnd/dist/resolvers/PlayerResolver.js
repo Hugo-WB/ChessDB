@@ -36,9 +36,6 @@ let PlayerResovler = class PlayerResovler {
             return players;
         });
     }
-    player(id, { em }) {
-        return em.findOne(Player_1.Player, { id });
-    }
     createPlayer(name, rating, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             const player = em.create(Player_1.Player, {
@@ -81,14 +78,6 @@ __decorate([
     __metadata("design:paramtypes", [Number, String, Object]),
     __metadata("design:returntype", Promise)
 ], PlayerResovler.prototype, "players", null);
-__decorate([
-    type_graphql_1.Query(() => Player_1.Player, { nullable: true }),
-    __param(0, type_graphql_1.Arg("id")),
-    __param(1, type_graphql_1.Ctx()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
-    __metadata("design:returntype", Promise)
-], PlayerResovler.prototype, "player", null);
 __decorate([
     type_graphql_1.Mutation(() => Player_1.Player, { nullable: true }),
     __param(0, type_graphql_1.Arg("name")),

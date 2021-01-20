@@ -6,7 +6,8 @@
       "dom",
       "es6",
       "es2017",
-      "esnext.asynciterable"
+      "esnext.asynciterable",
+      "ES2020.Promise"
     ],
     "sourceMap": true,
     "outDir": "./dist",
@@ -16,8 +17,8 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,

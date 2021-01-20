@@ -11,7 +11,7 @@ import {
   Resolver,
 } from "type-graphql";
 import { Player } from "../entities/Player";
-import { Collection, Filter } from "@mikro-orm/core";
+import { Collection, Filter, Reference } from "@mikro-orm/core";
 import { EntityManager } from "@mikro-orm/postgresql";
 
 @ObjectType()
@@ -61,7 +61,12 @@ export class GameResovler {
       })
       .offset(offset ?? 0)
       .limit(Math.min(limit, 50));
-    let games: Game[] = results.map((result: any) => em.map(Game, result));
+    let games: Game[] = results.map(async (result: any) => {
+      let game: Game = em.map(Game, result);
+      game.white = await em.findOneOrFail(Player, { id: game.white.id });
+      game.black = await em.findOneOrFail(Player, { id: game.black.id });
+      return game;
+    });
     return games;
   }
 

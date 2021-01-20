@@ -6,15 +6,21 @@ let getPlayers = async () => {
   let playerZipsSet: Set<string> = new Set();
   let $ = await getLinkCheerio("https://www.pgnmentor.com/files.html");
   let links = $("body > div:nth-child(1) > table:nth-child(9)").find("a");
-  links.each((i, link) => {
+  links.each((_, link) => {
     let href = $(link).attr("href");
-    if (href.includes(".zip")) {
+    if (href?.includes(".zip")) {
       playerZipsSet.add(href);
     }
   });
+
   let playerZips = Array.from(playerZipsSet);
-  const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+  console.log(playerZips);
+  const bar = new cliProgress.SingleBar(
+    { clearOnComplete: true, hideCursor: true },
+    cliProgress.Presets.shades_grey
+  );
   bar.start(playerZips.length, 0);
+
   playerZips.forEach(async (playerZip) => {
     let path = await downloadZip(
       "http://www.pgnmentor.com/" + playerZip,
@@ -23,7 +29,8 @@ let getPlayers = async () => {
     await extractZip(path, "./assets/PgnMentor/Players");
     bar.increment();
   });
-  bar.stop();
+  console.log("DONE");
 };
+
 
 export { getPlayers };

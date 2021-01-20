@@ -59,7 +59,12 @@ let GameResovler = class GameResovler {
             })
                 .offset(offset !== null && offset !== void 0 ? offset : 0)
                 .limit(Math.min(limit, 50));
-            let games = results.map((result) => em.map(Game_1.Game, result));
+            let games = results.map((result) => __awaiter(this, void 0, void 0, function* () {
+                let game = em.map(Game_1.Game, result);
+                game.white = yield em.findOneOrFail(Player_1.Player, { id: game.white.id });
+                game.black = yield em.findOneOrFail(Player_1.Player, { id: game.black.id });
+                return game;
+            }));
             return games;
         });
     }
