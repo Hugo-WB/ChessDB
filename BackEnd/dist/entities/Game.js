@@ -56,10 +56,10 @@ __decorate([
     __metadata("design:type", Player_1.Player)
 ], Game.prototype, "black", void 0);
 __decorate([
-    type_graphql_1.Field(),
-    core_1.Property({ type: "boolean" }),
-    __metadata("design:type", Boolean)
-], Game.prototype, "whiteWin", void 0);
+    type_graphql_1.Field(() => type_graphql_1.Int),
+    core_1.Property(),
+    __metadata("design:type", Number)
+], Game.prototype, "winner", void 0);
 __decorate([
     type_graphql_1.Field(() => type_graphql_1.Int),
     core_1.Property(),
@@ -80,6 +80,11 @@ __decorate([
     core_1.Property(),
     __metadata("design:type", Array)
 ], Game.prototype, "blackMoves", void 0);
+__decorate([
+    type_graphql_1.Field(() => type_graphql_1.Int),
+    core_1.Property(),
+    __metadata("design:type", Number)
+], Game.prototype, "averageRating", void 0);
 Game = __decorate([
     type_graphql_1.ObjectType(),
     core_1.Entity()

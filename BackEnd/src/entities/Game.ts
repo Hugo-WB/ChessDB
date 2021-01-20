@@ -33,9 +33,9 @@ export class Game {
   @ManyToOne()
   black!: Player;
 
-  @Field()
-  @Property({type:"boolean"})
-  whiteWin!:boolean;
+  @Field(()=>Int)
+  @Property()
+  winner:number;
 
   @Field(() => Int)
   @Property()
@@ -52,4 +52,8 @@ export class Game {
   @Field(()=>[String])
   @Property()
   blackMoves:string[]
+
+  @Field(()=>Int)
+  @Property()
+  averageRating:number;
 }

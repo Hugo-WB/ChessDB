@@ -27,16 +27,20 @@ export class GameResovler {
   // GET
   @Query(() => [Game])
   async games(
-    @Arg("id", { nullable: true }) gameId: number,
-    @Arg("playerId", { nullable: true }) playerId: number,
-    @Arg("maxLength", { nullable: true }) maxLength: number,
-    @Arg("minLength", { nullable: true }) minLength: number,
+    @Arg("id", () => Int, { nullable: true }) gameId: number,
+    @Arg("playerId", () => Int, { nullable: true }) playerId: number,
+    @Arg("maxLength", () => Int, { nullable: true }) maxLength: number,
+    @Arg("minLength", () => Int, { nullable: true }) minLength: number,
     @Arg("opening", { nullable: true }) opening: string,
+    @Arg("limit", () => Int, { nullable: true, defaultValue: 20 })
+    limit: number,
+    @Arg("offset", () => Int, { nullable: true }) offset: number,
     @Ctx() { em }: MyContext
   ): Promise<Game[]> {
     let results = await (em as EntityManager)
       .createQueryBuilder(Game)
       .getKnexQuery()
+      .orderBy("average_rating", "desc")
       .where(
         Object.assign(
           {},
@@ -49,18 +53,16 @@ export class GameResovler {
           builder.where({ white_id: playerId }).orWhere({ black_id: playerId });
         }
         if (maxLength) {
-          builder.where("maxLength", ">=", "length");
+          builder.where("length", "<=", maxLength);
         }
         if (minLength) {
-          builder.where("minLength", "<=", "length");
+          builder.where("length", ">=", minLength);
         }
-      });
+      })
+      .offset(offset ?? 0)
+      .limit(Math.min(limit, 50));
     let games: Game[] = results.map((result: any) => em.map(Game, result));
     return games;
-    // if (gameId != undefined) {
-    //   return em.find(Game, { id: gameId });
-    // }
-    // return em.find(Game, {}, {});
   }
 
   @Mutation(() => GameResponse)
@@ -68,12 +70,13 @@ export class GameResovler {
     @Arg("pgn") pgn: string,
     @Arg("whiteID") whiteID: number,
     @Arg("blackID") blackID: number,
-    @Arg("blackMoves",()=>[String]) blackMoves:string[],
-    @Arg("whiteMoves",()=>[String]) whiteMoves:string[],
-    @Arg("opening",()=>String) opening:string,
-    @Arg("length",()=>Int) length:number,
-    @Arg("playDate",()=>String) playDate:string,
-    @Arg("whiteWin",()=>Boolean) whiteWin:boolean,
+    @Arg("blackMoves", () => [String]) blackMoves: string[],
+    @Arg("whiteMoves", () => [String]) whiteMoves: string[],
+    @Arg("opening", () => String) opening: string,
+    @Arg("length", () => Int) length: number,
+    @Arg("playDate", () => String) playDate: string,
+    @Arg("winner", () => Int) winner: number,
+    @Arg("averageRating", () => Int) averageRating: number,
     @Ctx()
     { em }: MyContext
   ): Promise<GameResponse> {
@@ -84,17 +87,19 @@ export class GameResovler {
         pgn: pgn,
         white: whiteRef,
         black: blackRef,
-        blackMoves:blackMoves,
-        whiteMoves:whiteMoves,
-        opening:opening,
-        length:length,
-        playedAt:playDate,
-        whiteWin:whiteWin
+        blackMoves: blackMoves,
+        whiteMoves: whiteMoves,
+        opening: opening,
+        length: length,
+        playedAt: playDate,
+        winner: winner,
+        averageRating: averageRating,
       });
       await em.persistAndFlush(game);
 
       return { game };
     } catch (error) {
+      console.log(error);
       // return { error: "Error creating, make sure played id is correct!" };
       return { error: error };
     }
