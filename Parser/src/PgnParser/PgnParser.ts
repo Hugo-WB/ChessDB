@@ -60,6 +60,7 @@ const parsePGN = async (
   filePath: string,
   func?: (game: Game) => void
 ): Promise<Game[]> => {
+  
   const tagReg = new RegExp(/\[.+\]/);
   let lines = getReadLine(filePath);
   let games: Game[] = [];
