@@ -8,11 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const Sql_1 = require("./Sql");
+const apollo_boost_1 = __importDefault(require("apollo-boost"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    let games = yield Sql_1.parseFolderPGNS("./assets/PgnMentor/players/");
-    console.log(games[0].getSeperatedMoves());
+    const client = new apollo_boost_1.default({
+        uri: "http://localhost:4000/graphql",
+    });
 });
 main();
 //# sourceMappingURL=index.js.map

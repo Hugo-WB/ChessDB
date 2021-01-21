@@ -19,65 +19,95 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Game = exports.parsePGN = void 0;
+exports.parseFolderPGNS = exports.parsePGN = void 0;
 const fs_1 = __importDefault(require("fs"));
 const readline_1 = __importDefault(require("readline"));
 const pgn_parser_1 = __importDefault(require("pgn-parser"));
-class Game {
-    constructor() {
-        this.pgn = "";
-        this.event = "";
-        this.site = "";
-        this.date = "";
-        this.round = "";
-        this.white = "";
-        this.black = "";
-        this.result = "";
-        this.whiteMoves = [];
-        this.blackMoves = [];
-        this.getSeperatedMoves = () => {
-            try {
-                let parsed = pgn_parser_1.default.parse(this.pgn)[0];
-                if (parsed.moves == undefined) {
-                    return;
-                }
-                if (parsed.moves.length == undefined || parsed.moves == undefined) {
-                    return;
-                }
-                for (let i = 0; i < parsed.moves.length; i++) {
-                    if (i % 2 === 0) {
-                        this.whiteMoves.push(parsed.moves[i].move);
-                    }
-                    else {
-                        this.blackMoves.push(parsed.moves[i].move);
-                    }
-                }
-                return [this.whiteMoves, this.blackMoves];
-            }
-            catch (error) { }
-        };
+const cli_progress_1 = __importDefault(require("cli-progress"));
+let parseFolderPGNS = (folderPath, func) => __awaiter(void 0, void 0, void 0, function* () {
+    let games = [];
+    let files = [];
+    fs_1.default.readdirSync(folderPath).forEach((file) => {
+        if (/.+\.pgn/.test(file)) {
+            files.push(file);
+        }
+    });
+    const bar = new cli_progress_1.default.SingleBar({}, cli_progress_1.default.Presets.shades_grey);
+    bar.start(files.length, 0);
+    for (let i = 0; i < files.length; i++) {
+        games = games.concat(yield parsePGN(folderPath + files[i]));
+        bar.update(i);
     }
-}
-exports.Game = Game;
+    bar.stop();
+    return games;
+});
+exports.parseFolderPGNS = parseFolderPGNS;
 const getReadLine = (filePath) => {
     return readline_1.default.createInterface({
         input: fs_1.default.createReadStream(filePath),
     });
 };
-const parsePGN = (filePath, func) => __awaiter(void 0, void 0, void 0, function* () {
+const parseSinglePGN = (pgn) => {
+    try {
+        let parsed = pgn_parser_1.default.parse(pgn)[0];
+        let game = { pgn: pgn, blackMoves: [], whiteMoves: [] };
+        game.pgn = pgn;
+        for (let i = 0; i < parsed.moves.length; i++) {
+            if (i % 2 === 0) {
+                game.whiteMoves.push(parsed.moves[i].move);
+            }
+            else {
+                game.blackMoves.push(parsed.moves[i].move);
+            }
+        }
+        parsed.headers.forEach((header) => {
+            switch (header.name) {
+                case "Date":
+                    game.date = header.value;
+                    break;
+                case "White":
+                    game.white = header.value;
+                    break;
+                case "Black":
+                    game.black = header.value;
+                    break;
+                case "Result":
+                    game.result = header.value;
+                    break;
+                case "WhiteElo":
+                    game.whiteElo = parseInt(header.value);
+                    break;
+                case "BlackElo":
+                    game.blackElo = parseInt(header.value);
+                    break;
+                default:
+                    break;
+            }
+        });
+        return game;
+    }
+    catch (error) {
+        return undefined;
+    }
+    return undefined;
+};
+const parsePGN = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
     var e_1, _a;
+    let games = [];
     const tagReg = new RegExp(/\[.+\]/);
     let lines = getReadLine(filePath);
-    let games = [];
-    let currentGame = new Game();
+    let currentGame = "";
     let currentStatus = "tag";
     try {
         for (var lines_1 = __asyncValues(lines), lines_1_1; lines_1_1 = yield lines_1.next(), !lines_1_1.done;) {
             const line = lines_1_1.value;
             if (tagReg.test(line)) {
                 if (currentStatus == "game") {
-                    games.push(currentGame);
-                    currentGame = new Game();
+                    let parsedGame = parseSinglePGN(currentGame);
+                    if (parsedGame != undefined) {
+                        games.push(parsedGame);
+                    }
+                    currentGame = "";
                     currentStatus = "tag";
                 }
             }
@@ -86,7 +116,7 @@ const parsePGN = (filePath, func) => __awaiter(void 0, void 0, void 0, function*
             else {
                 currentStatus = "game";
             }
-            currentGame.pgn += line;
+            currentGame += line;
         }
     }
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -96,10 +126,10 @@ const parsePGN = (filePath, func) => __awaiter(void 0, void 0, void 0, function*
         }
         finally { if (e_1) throw e_1.error; }
     }
-    if (func) {
-        func(currentGame);
+    let parsedGame = parseSinglePGN(currentGame);
+    if (parsedGame != null) {
+        games.push(parsedGame);
     }
-    games.push(currentGame);
     return games;
 });
 exports.parsePGN = parsePGN;
