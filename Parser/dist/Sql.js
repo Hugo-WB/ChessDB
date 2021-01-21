@@ -16,7 +16,7 @@ exports.uploadPGN = exports.parseFolderPGNS = void 0;
 const fs_1 = __importDefault(require("fs"));
 const PgnParser_1 = require("./PgnParser/PgnParser");
 const cli_progress_1 = __importDefault(require("cli-progress"));
-let parseFolderPGNS = (folderPath) => __awaiter(void 0, void 0, void 0, function* () {
+let parseFolderPGNS = (folderPath, func) => __awaiter(void 0, void 0, void 0, function* () {
     let games = [];
     let files = [];
     fs_1.default.readdirSync(folderPath).forEach((file) => {
@@ -25,7 +25,7 @@ let parseFolderPGNS = (folderPath) => __awaiter(void 0, void 0, void 0, function
     const bar = new cli_progress_1.default.SingleBar({}, cli_progress_1.default.Presets.shades_grey);
     bar.start(files.length, 0);
     for (let i = 0; i < files.length; i++) {
-        games = games.concat(yield PgnParser_1.parsePGN(folderPath + files[i]));
+        games = games.concat(yield PgnParser_1.parsePGN(folderPath + files[i], func));
         bar.update(i);
     }
     bar.stop();

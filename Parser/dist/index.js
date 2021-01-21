@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Sql_1 = require("./Sql");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     let games = yield Sql_1.parseFolderPGNS("./assets/PgnMentor/players/");
-    console.log(games);
+    console.log(games[0].getSeperatedMoves());
 });
 main();
 //# sourceMappingURL=index.js.map

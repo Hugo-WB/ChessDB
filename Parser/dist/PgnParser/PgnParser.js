@@ -22,6 +22,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = exports.parsePGN = void 0;
 const fs_1 = __importDefault(require("fs"));
 const readline_1 = __importDefault(require("readline"));
+const pgn_parser_1 = __importDefault(require("pgn-parser"));
 class Game {
     constructor() {
         this.pgn = "";
@@ -32,6 +33,29 @@ class Game {
         this.white = "";
         this.black = "";
         this.result = "";
+        this.whiteMoves = [];
+        this.blackMoves = [];
+        this.getSeperatedMoves = () => {
+            try {
+                let parsed = pgn_parser_1.default.parse(this.pgn)[0];
+                if (parsed.moves == undefined) {
+                    return;
+                }
+                if (parsed.moves.length == undefined || parsed.moves == undefined) {
+                    return;
+                }
+                for (let i = 0; i < parsed.moves.length; i++) {
+                    if (i % 2 === 0) {
+                        this.whiteMoves.push(parsed.moves[i].move);
+                    }
+                    else {
+                        this.blackMoves.push(parsed.moves[i].move);
+                    }
+                }
+                return [this.whiteMoves, this.blackMoves];
+            }
+            catch (error) { }
+        };
     }
 }
 exports.Game = Game;
@@ -40,7 +64,7 @@ const getReadLine = (filePath) => {
         input: fs_1.default.createReadStream(filePath),
     });
 };
-const parsePGN = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
+const parsePGN = (filePath, func) => __awaiter(void 0, void 0, void 0, function* () {
     var e_1, _a;
     const tagReg = new RegExp(/\[.+\]/);
     let lines = getReadLine(filePath);
@@ -56,73 +80,13 @@ const parsePGN = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
                     currentGame = new Game();
                     currentStatus = "tag";
                 }
-                if (/Event\s/.test(line)) {
-                    try {
-                        currentGame.event = line.match(/"(.*?")/)[0].replace('"', "");
-                    }
-                    catch (_b) { }
-                }
-                if (/Site\s/.test(line)) {
-                    try {
-                        currentGame.site = line.match(/"(.*?")/)[0].replace('"', "");
-                    }
-                    catch (_c) { }
-                }
-                if (/Date\s/.test(line)) {
-                    try {
-                        currentGame.date = line.match(/"(.*?")/)[0].replace('"', "");
-                    }
-                    catch (_d) { }
-                }
-                if (/Round\s/.test(line)) {
-                    try {
-                        currentGame.round = line.match(/"(.*?")/)[0].replace('"', "");
-                    }
-                    catch (_e) { }
-                }
-                if (/White\s/.test(line)) {
-                    try {
-                        currentGame.white = line.match(/"(.*?")/)[0].replace('"', "");
-                    }
-                    catch (_f) { }
-                }
-                if (/Black\s/.test(line)) {
-                    try {
-                        currentGame.black = line.match(/"(.*?")/)[0].replace('"', "");
-                    }
-                    catch (_g) { }
-                }
-                if (/Result\s/.test(line)) {
-                    try {
-                        currentGame.result = line.match(/"(.*?")/)[0].replace('"', "");
-                    }
-                    catch (_h) { }
-                }
-                if (/WhiteElo\s/.test(line)) {
-                    try {
-                        currentGame.whiteElo = parseInt(line.match(/"(.*?")/)[0].replace('"', ""));
-                    }
-                    catch (_j) { }
-                }
-                if (/BlackElo\s/.test(line)) {
-                    try {
-                        currentGame.blackElo = parseInt(line.match(/"(.*?")/)[0].replace('"', ""));
-                    }
-                    catch (_k) { }
-                }
-                if (/ECO\s/.test(line)) {
-                    try {
-                        currentGame.eco = line.match(/"(.*?")/)[0].replace('"', "");
-                    }
-                    catch (_l) { }
-                }
             }
             else if (line === "") {
             }
             else {
                 currentStatus = "game";
-                currentGame.pgn += line;
             }
+            currentGame.pgn += line;
         }
     }
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -131,6 +95,9 @@ const parsePGN = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
             if (lines_1_1 && !lines_1_1.done && (_a = lines_1.return)) yield _a.call(lines_1);
         }
         finally { if (e_1) throw e_1.error; }
+    }
+    if (func) {
+        func(currentGame);
     }
     games.push(currentGame);
     return games;
