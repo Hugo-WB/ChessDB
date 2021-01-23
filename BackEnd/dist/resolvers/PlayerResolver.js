@@ -71,7 +71,7 @@ let PlayerResovler = class PlayerResovler {
 };
 __decorate([
     type_graphql_1.Query(() => [Player_1.Player]),
-    __param(0, type_graphql_1.Arg("id", { nullable: true })),
+    __param(0, type_graphql_1.Arg("id", () => type_graphql_1.Int, { nullable: true })),
     __param(1, type_graphql_1.Arg("name", { nullable: true })),
     __param(2, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
@@ -81,7 +81,7 @@ __decorate([
 __decorate([
     type_graphql_1.Mutation(() => Player_1.Player, { nullable: true }),
     __param(0, type_graphql_1.Arg("name")),
-    __param(1, type_graphql_1.Arg("rating")),
+    __param(1, type_graphql_1.Arg("rating", () => type_graphql_1.Int, { nullable: true, defaultValue: 0 })),
     __param(2, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Number, Object]),
@@ -89,9 +89,9 @@ __decorate([
 ], PlayerResovler.prototype, "createPlayer", null);
 __decorate([
     type_graphql_1.Mutation(() => Player_1.Player, { nullable: true }),
-    __param(0, type_graphql_1.Arg("id")),
+    __param(0, type_graphql_1.Arg("id", () => type_graphql_1.Int)),
     __param(1, type_graphql_1.Arg("name")),
-    __param(2, type_graphql_1.Arg("rating")),
+    __param(2, type_graphql_1.Arg("rating", () => type_graphql_1.Int)),
     __param(3, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, String, Number, Object]),
@@ -99,7 +99,7 @@ __decorate([
 ], PlayerResovler.prototype, "updatePlayer", null);
 __decorate([
     type_graphql_1.Mutation(() => Player_1.Player, { nullable: true }),
-    __param(0, type_graphql_1.Arg("id")),
+    __param(0, type_graphql_1.Arg("id", () => type_graphql_1.Int)),
     __param(1, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Object]),

@@ -7,10 +7,10 @@ import { EntityManager } from "@mikro-orm/postgresql";
 export class PlayerResovler {
   @Query(() => [Player])
   async players(
-    @Arg("id", { nullable: true }) id: number,
+    @Arg("id", () => Int, { nullable: true }) id: number,
     @Arg("name", { nullable: true }) name: string,
-    // @Arg("maxRating", { nullable: true }) maxRating: number,
-    // @Arg("minRating", { nullable: true }) minRating: number,
+    // @Arg("maxRating",()=>Int, { nullable: true }) maxRating: number,
+    // @Arg("minRating", ()=>Int,{ nullable: true }) minRating: number,
     @Ctx() { em }: MyContext
   ): Promise<Player[]> {
     let results = await (em as EntityManager)
@@ -33,7 +33,8 @@ export class PlayerResovler {
   @Mutation(() => Player, { nullable: true })
   async createPlayer(
     @Arg("name") name: string,
-    @Arg("rating") rating: number,
+    @Arg("rating", () => Int, { nullable: true, defaultValue: 0 })
+    rating: number,
     @Ctx() { em }: MyContext
   ): Promise<Player> {
     const player = em.create(Player, {
@@ -46,9 +47,9 @@ export class PlayerResovler {
 
   @Mutation(() => Player, { nullable: true })
   async updatePlayer(
-    @Arg("id") id: number,
+    @Arg("id", () => Int) id: number,
     @Arg("name") name: string,
-    @Arg("rating") rating: number,
+    @Arg("rating", () => Int) rating: number,
     @Ctx() { em }: MyContext
   ): Promise<Player | null> {
     const player = await em.findOne(Player, { id });
@@ -63,7 +64,7 @@ export class PlayerResovler {
 
   @Mutation(() => Player, { nullable: true })
   async deletePlayer(
-    @Arg("id") id: number,
+    @Arg("id", () => Int) id: number,
     @Ctx() { em }: MyContext
   ): Promise<Player | null> {
     let player = await em.findOne(Player, { id });

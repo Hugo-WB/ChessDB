@@ -39,13 +39,13 @@ GameResponse = __decorate([
     type_graphql_1.ObjectType()
 ], GameResponse);
 let GameResovler = class GameResovler {
-    games(gameId, playerId, maxLength, minLength, opening, limit, offset, winner, { em }) {
+    games(gameId, playerId, maxLength, minLength, opening, limit, offset, result, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             let results = yield em
                 .createQueryBuilder(Game_1.Game)
                 .getKnexQuery()
                 .orderBy("average_rating", "desc")
-                .where(Object.assign({}, gameId === undefined ? null : { id: gameId }, opening === undefined ? null : { opening: opening }, winner === undefined ? null : { winner: winner }))
+                .where(Object.assign({}, gameId === undefined ? null : { id: gameId }, opening === undefined ? null : { opening: opening }, result === undefined ? null : { result: result }))
                 .andWhere((builder) => {
                 if (playerId) {
                     builder.where({ white_id: playerId }).orWhere({ black_id: playerId });
@@ -68,7 +68,7 @@ let GameResovler = class GameResovler {
             return games;
         });
     }
-    createGame(pgn, whiteID, blackID, blackMoves, whiteMoves, opening, length, playDate, winner, averageRating, { em }) {
+    createGame(pgn, whiteID, blackID, blackMoves, whiteMoves, opening, length, playDate, result, averageRating, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const whiteRef = em.getReference(Player_1.Player, whiteID);
@@ -82,7 +82,7 @@ let GameResovler = class GameResovler {
                     opening: opening,
                     length: length,
                     playedAt: playDate,
-                    winner: winner,
+                    result: result,
                     averageRating: averageRating,
                 });
                 yield em.persistAndFlush(game);
@@ -127,7 +127,7 @@ __decorate([
     __param(4, type_graphql_1.Arg("opening", { nullable: true })),
     __param(5, type_graphql_1.Arg("limit", () => type_graphql_1.Int, { nullable: true, defaultValue: 20 })),
     __param(6, type_graphql_1.Arg("offset", () => type_graphql_1.Int, { nullable: true })),
-    __param(7, type_graphql_1.Arg("winner", () => String, { nullable: true })),
+    __param(7, type_graphql_1.Arg("result", () => String, { nullable: true })),
     __param(8, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Number, Number, Number, String, Number, Number, String, Object]),
@@ -143,7 +143,7 @@ __decorate([
     __param(5, type_graphql_1.Arg("opening", () => String)),
     __param(6, type_graphql_1.Arg("length", () => type_graphql_1.Int)),
     __param(7, type_graphql_1.Arg("playDate", () => String)),
-    __param(8, type_graphql_1.Arg("winner", () => String)),
+    __param(8, type_graphql_1.Arg("result", () => String)),
     __param(9, type_graphql_1.Arg("averageRating", () => type_graphql_1.Int)),
     __param(10, type_graphql_1.Ctx()),
     __metadata("design:type", Function),

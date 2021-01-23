@@ -34,7 +34,7 @@ export class GameResovler {
     @Arg("limit", () => Int, { nullable: true, defaultValue: 20 })
     limit: number,
     @Arg("offset", () => Int, { nullable: true }) offset: number,
-    @Arg("winner", () => String, { nullable: true }) winner: string,
+    @Arg("result", () => String, { nullable: true }) result: string,
     @Ctx() { em }: MyContext
   ): Promise<Game[]> {
     let results = await (em as EntityManager)
@@ -46,7 +46,7 @@ export class GameResovler {
           {},
           gameId === undefined ? null : { id: gameId },
           opening === undefined ? null : { opening: opening },
-          winner === undefined ? null : { winner: winner }
+          result === undefined ? null : { result: result }
         )
       )
       .andWhere((builder) => {
@@ -81,7 +81,7 @@ export class GameResovler {
     @Arg("opening", () => String) opening: string,
     @Arg("length", () => Int) length: number,
     @Arg("playDate", () => String) playDate: string,
-    @Arg("winner", () => String) winner: string,
+    @Arg("result", () => String) result: string,
     @Arg("averageRating", () => Int) averageRating: number,
     @Ctx()
     { em }: MyContext
@@ -98,7 +98,7 @@ export class GameResovler {
         opening: opening,
         length: length,
         playedAt: playDate,
-        winner: winner,
+        result: result,
         averageRating: averageRating,
       });
       await em.persistAndFlush(game);
