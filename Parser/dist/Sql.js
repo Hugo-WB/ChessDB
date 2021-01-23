@@ -9,10 +9,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadPGN = void 0;
+exports.getPlayerIdOrCreate = exports.uploadPGN = void 0;
 const graphql_request_1 = require("graphql-request");
-const pgnQuery = "INSERT INTO";
-let uploadPGN = (pgn, client) => __awaiter(void 0, void 0, void 0, function* () {
+let getPlayerIdOrCreate = (client, name, rating) => __awaiter(void 0, void 0, void 0, function* () {
+    const createPlayer = graphql_request_1.gql `
+  mutation CreatePlayer($rating:Int,$name:String,client:GraphQLClient){
+    createPlayer(rating:$rating,name:$name){
+      id
+      name
+      createdAt
+    }
+  }
+  `;
+    const findPlayer = graphql_request_1.gql `
+    query getPlayer($name: String) {
+      players(name: $name) {
+        id
+      }
+    }
+  `;
+    let { players } = yield client.request(findPlayer, { name: name });
+    if (players.length == 1) {
+        return players[0].id;
+    }
+    let { player } = yield client.request(createPlayer, {
+        name: name,
+        rating: rating,
+    });
+    return player.id;
+});
+exports.getPlayerIdOrCreate = getPlayerIdOrCreate;
+let uploadPGN = (game, client) => __awaiter(void 0, void 0, void 0, function* () {
     const createGame = graphql_request_1.gql `
     mutation CreateGame(
       $blackId: Int
@@ -21,7 +48,7 @@ let uploadPGN = (pgn, client) => __awaiter(void 0, void 0, void 0, function* () 
       $opening: String
       $length: Int
       $playDate: String
-      $winner: String
+      $result: String
       $averageRating: Int
       $whiteMoves: [String]
       $blackMoves: [String]
@@ -33,7 +60,7 @@ let uploadPGN = (pgn, client) => __awaiter(void 0, void 0, void 0, function* () 
         opening: $opening
         length: $length
         playDate: $playDate
-        winner: $winner
+        result: $result
         averageRating: $averageRating
         whiteMoves: $whiteMoves
         blackMoves: $blackMoves
@@ -46,7 +73,22 @@ let uploadPGN = (pgn, client) => __awaiter(void 0, void 0, void 0, function* () 
       }
     }
   `;
-    let result = yield client.request(createGame, { id: 2 });
+    let length = Math.floor(game.blackMoves.length + game.whiteMoves.length);
+    let blackId = yield getPlayerIdOrCreate(client, game.black, game.blackElo);
+    let whiteId = yield getPlayerIdOrCreate(client, game.white, game.whiteElo);
+    let createGameOptions = {
+        pgn: game.pgn,
+        averageRating: Math.round((game.blackElo + game.whiteElo) / 2),
+        blackMoves: game.blackMoves,
+        whiteMoves: game.whiteMoves,
+        opening: game.eco,
+        result: game.result,
+        playDate: game.date,
+        blackId: blackId,
+        whiteId: whiteId,
+        length: length,
+    };
+    let result = yield client.request(createGame);
 });
 exports.uploadPGN = uploadPGN;
 //# sourceMappingURL=Sql.js.map

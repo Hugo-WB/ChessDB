@@ -50,7 +50,18 @@ const getReadLine = (filePath) => {
 const parseSinglePGN = (pgn) => {
     try {
         let parsed = pgn_parser_1.default.parse(pgn)[0];
-        let game = { pgn: pgn, blackMoves: [], whiteMoves: [] };
+        let game = {
+            pgn: pgn,
+            blackMoves: [],
+            whiteMoves: [],
+            black: "",
+            blackElo: 0,
+            date: "",
+            eco: "",
+            result: "",
+            white: "",
+            whiteElo: 0,
+        };
         game.pgn = pgn;
         for (let i = 0; i < parsed.moves.length; i++) {
             if (i % 2 === 0) {

@@ -7,18 +7,18 @@ import { callbackify } from "util";
 
 interface Game {
   // "REQUIRED"
-  pgn?: string;
+  pgn: string;
   // event: string = "";
   // site: string = "";
-  date?: string;
+  date: string;
   // round: string = "";
-  white?: string;
-  black?: string;
-  result?: string;
+  white: string;
+  black: string;
+  result: string;
   // optional:
-  eco?: string;
-  whiteElo?: number;
-  blackElo?: number;
+  eco: string;
+  whiteElo: number;
+  blackElo: number;
   // annotator?: string;
   // plyCount?: string;
   // timeControl?: string;
@@ -30,28 +30,6 @@ interface Game {
   // custom:
   whiteMoves: string[];
   blackMoves: string[];
-
-  // getSeperatedMoves = () => {
-  //   try {
-  //     let parsed: any = pgnParser.parse(this.pgn)[0];
-  //     if (parsed.moves == undefined) {
-  //       return;
-  //     }
-  //     if (parsed.moves.length == undefined || parsed.moves == undefined) {
-  //       return;
-  //     }
-  //     for (let i = 0; i < parsed.moves.length; i++) {
-  //       if (i % 2 === 0) {
-  //         this.whiteMoves.push(parsed.moves[i].move);
-  //       } else {
-  //         this.blackMoves.push(parsed.moves[i].move);
-  //       }
-  //     }
-  //     return [this.whiteMoves, this.blackMoves];
-  //   } catch (error) {
-  //     return [];
-  //   }
-  // };
 }
 let parseFolderPGNS = async (
   folderPath: string,
@@ -68,11 +46,6 @@ let parseFolderPGNS = async (
   bar.start(files.length, 0);
 
   for (let i = 0; i < files.length; i++) {
-    // console.log(files[i]);
-    // games = games.concat(parsePGN(folderPath + files[i], func));
-    // games = games.concat(parsePGN(folderPath + files[i], func));
-    // testParse(folderPath + files[i]);
-    // games.concat(await parsePGN(folderPath + files[i]));
     games = games.concat(await parsePGN(folderPath + files[i]));
     bar.update(i);
   }
@@ -97,28 +70,6 @@ interface ParsedGame {
   result: string;
 }
 
-// const testParse = (filePath: string) => {
-//   let parsedGames: ParsedGame[] = [];
-//   let games: Game[] = [];
-//   try {
-//     let file = fs.readFileSync(filePath, "utf-8");
-//     parsedGames = pgnParser.parse(file);
-//   } catch {
-//     return [];
-//   }
-//   parsedGames.forEach((parsed: ParsedGame) => {
-//     let game: Game = new Game();
-//     for (let i = 0; i < parsed.moves.length; i++) {
-//       if (i % 2 === 0) {
-//         game.whiteMoves.push(parsed.moves[i].move);
-//       } else {
-//         game.blackMoves.push(parsed.moves[i].move);
-//       }
-//     }
-//   });
-//   return parsedGames;
-// };
-
 const getReadLine = (filePath: string) => {
   return readline.createInterface({
     input: fs.createReadStream(filePath),
@@ -129,7 +80,18 @@ const getReadLine = (filePath: string) => {
 const parseSinglePGN = (pgn: string): Game | undefined => {
   try {
     let parsed: ParsedGame = pgnParser.parse(pgn)[0];
-    let game: Game = { pgn: pgn, blackMoves: [], whiteMoves: [] };
+    let game: Game = {
+      pgn: pgn,
+      blackMoves: [],
+      whiteMoves: [],
+      black: "",
+      blackElo: 0,
+      date: "",
+      eco: "",
+      result: "",
+      white: "",
+      whiteElo: 0,
+    };
     game.pgn = pgn;
     for (let i = 0; i < parsed.moves.length; i++) {
       if (i % 2 === 0) {

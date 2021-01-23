@@ -1,6 +1,6 @@
 // import {getPlayers} from "./Scraper/PgnMentor";
-import {} from "./Sql";
-import { parseFolderPGNS } from "./PgnParser/PgnParser";
+import { getPlayerIdOrCreate } from "./Sql";
+import { parseFolderPGNS, parsePGN } from "./PgnParser/PgnParser";
 
 import { gql, GraphQLClient } from "graphql-request";
 
@@ -12,6 +12,7 @@ const main = async () => {
     // let games = await parseFolderPGNS("./assets/PgnMentor/players/");
     // let games = await parsePGN("./assets/PgnMentor/players/Adams.pgn");
     // console.log(games);
+    getPlayerIdOrCreate(client,"Gotham")
   } catch (error) {
     console.log(error);
   }

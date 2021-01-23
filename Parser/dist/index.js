@@ -9,10 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const Sql_1 = require("./Sql");
 const graphql_request_1 = require("graphql-request");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const client = new graphql_request_1.GraphQLClient("http://localhost:4000/graphql");
+        Sql_1.getPlayerIdOrCreate(client, "Gotham");
     }
     catch (error) {
         console.log(error);
