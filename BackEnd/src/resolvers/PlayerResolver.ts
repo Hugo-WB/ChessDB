@@ -1,8 +1,7 @@
 import { Player } from "../entities/Player";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { MyContext } from "src/types";
-import { Game } from "../entities/Game";
-import { EntityManager, QueryBuilder } from "@mikro-orm/postgresql";
+import { EntityManager } from "@mikro-orm/postgresql";
 
 @Resolver()
 export class PlayerResovler {

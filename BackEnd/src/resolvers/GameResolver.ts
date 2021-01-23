@@ -11,7 +11,6 @@ import {
   Resolver,
 } from "type-graphql";
 import { Player } from "../entities/Player";
-import { Collection, Filter, Reference } from "@mikro-orm/core";
 import { EntityManager } from "@mikro-orm/postgresql";
 
 @ObjectType()
@@ -35,6 +34,7 @@ export class GameResovler {
     @Arg("limit", () => Int, { nullable: true, defaultValue: 20 })
     limit: number,
     @Arg("offset", () => Int, { nullable: true }) offset: number,
+    @Arg("winner", () => String, { nullable: true }) winner: string,
     @Ctx() { em }: MyContext
   ): Promise<Game[]> {
     let results = await (em as EntityManager)
@@ -45,7 +45,8 @@ export class GameResovler {
         Object.assign(
           {},
           gameId === undefined ? null : { id: gameId },
-          opening === undefined ? null : { opening: opening }
+          opening === undefined ? null : { opening: opening },
+          winner === undefined ? null : { winner: winner }
         )
       )
       .andWhere((builder) => {
@@ -80,7 +81,7 @@ export class GameResovler {
     @Arg("opening", () => String) opening: string,
     @Arg("length", () => Int) length: number,
     @Arg("playDate", () => String) playDate: string,
-    @Arg("winner", () => Int) winner: number,
+    @Arg("winner", () => String) winner: string,
     @Arg("averageRating", () => Int) averageRating: number,
     @Ctx()
     { em }: MyContext

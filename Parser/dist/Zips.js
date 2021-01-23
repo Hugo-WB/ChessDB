@@ -21,7 +21,7 @@ let downloadZip = (url, path) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         let fileStream = fs_1.default.createWriteStream(path);
         const request = yield node_fetch_1.default(url);
-        yield request.body.pipe(fileStream);
+        request.body.pipe(fileStream);
         return new Promise((resolve) => {
             fileStream.on("finish", () => {
                 fileStream.close();

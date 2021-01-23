@@ -8,15 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const apollo_boost_1 = __importDefault(require("apollo-boost"));
+const graphql_request_1 = require("graphql-request");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    const client = new apollo_boost_1.default({
-        uri: "http://localhost:4000/graphql",
-    });
+    try {
+        const client = new graphql_request_1.GraphQLClient("http://localhost:4000/graphql");
+    }
+    catch (error) {
+        console.log(error);
+    }
 });
 main();
 //# sourceMappingURL=index.js.map

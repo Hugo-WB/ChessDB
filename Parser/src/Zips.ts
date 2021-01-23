@@ -10,7 +10,7 @@ let downloadZip = async (url: string, path: string) => {
     let fileStream = fs.createWriteStream(path);
     // const request = http.get(url, (response) => response.pipe(file));
     const request = await fetch(url);
-    await request.body.pipe(fileStream);
+    request.body.pipe(fileStream);
     return new Promise<string>((resolve) => {
       fileStream.on("finish", () => {
         fileStream.close();

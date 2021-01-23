@@ -21,6 +21,7 @@
     "extract-zip": "^2.0.1",
     "fs": "^0.0.1-security",
     "graphql": "^15.4.0",
+    "graphql-request": "^3.4.0",
     "line-reader": "^0.4.0",
     "node-fetch": "^2.6.1",
     "pg": "^8.5.1",

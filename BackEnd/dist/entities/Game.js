@@ -56,10 +56,10 @@ __decorate([
     __metadata("design:type", Player_1.Player)
 ], Game.prototype, "black", void 0);
 __decorate([
-    type_graphql_1.Field(() => type_graphql_1.Int),
+    type_graphql_1.Field(() => String),
     core_1.Property(),
-    __metadata("design:type", Number)
-], Game.prototype, "winner", void 0);
+    __metadata("design:type", String)
+], Game.prototype, "result", void 0);
 __decorate([
     type_graphql_1.Field(() => type_graphql_1.Int),
     core_1.Property(),

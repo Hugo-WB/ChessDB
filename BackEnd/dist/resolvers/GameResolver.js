@@ -39,13 +39,13 @@ GameResponse = __decorate([
     type_graphql_1.ObjectType()
 ], GameResponse);
 let GameResovler = class GameResovler {
-    games(gameId, playerId, maxLength, minLength, opening, limit, offset, { em }) {
+    games(gameId, playerId, maxLength, minLength, opening, limit, offset, winner, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             let results = yield em
                 .createQueryBuilder(Game_1.Game)
                 .getKnexQuery()
                 .orderBy("average_rating", "desc")
-                .where(Object.assign({}, gameId === undefined ? null : { id: gameId }, opening === undefined ? null : { opening: opening }))
+                .where(Object.assign({}, gameId === undefined ? null : { id: gameId }, opening === undefined ? null : { opening: opening }, winner === undefined ? null : { winner: winner }))
                 .andWhere((builder) => {
                 if (playerId) {
                     builder.where({ white_id: playerId }).orWhere({ black_id: playerId });
@@ -127,9 +127,10 @@ __decorate([
     __param(4, type_graphql_1.Arg("opening", { nullable: true })),
     __param(5, type_graphql_1.Arg("limit", () => type_graphql_1.Int, { nullable: true, defaultValue: 20 })),
     __param(6, type_graphql_1.Arg("offset", () => type_graphql_1.Int, { nullable: true })),
-    __param(7, type_graphql_1.Ctx()),
+    __param(7, type_graphql_1.Arg("winner", () => String, { nullable: true })),
+    __param(8, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, Number, Number, String, Number, Number, Object]),
+    __metadata("design:paramtypes", [Number, Number, Number, Number, String, Number, Number, String, Object]),
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "games", null);
 __decorate([
@@ -142,11 +143,11 @@ __decorate([
     __param(5, type_graphql_1.Arg("opening", () => String)),
     __param(6, type_graphql_1.Arg("length", () => type_graphql_1.Int)),
     __param(7, type_graphql_1.Arg("playDate", () => String)),
-    __param(8, type_graphql_1.Arg("winner", () => type_graphql_1.Int)),
+    __param(8, type_graphql_1.Arg("winner", () => String)),
     __param(9, type_graphql_1.Arg("averageRating", () => type_graphql_1.Int)),
     __param(10, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number, Number, Array, Array, String, Number, String, Number, Number, Object]),
+    __metadata("design:paramtypes", [String, Number, Number, Array, Array, String, Number, String, String, Number, Object]),
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "createGame", null);
 __decorate([
