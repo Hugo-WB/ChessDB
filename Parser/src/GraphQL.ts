@@ -1,14 +1,14 @@
 import { Game } from "./PgnParser/PgnParser";
 import { request, gql, GraphQLClient } from "graphql-request";
 const createPlayer = gql`
-  mutation CreatePlayer($rating:Int,$name:String!){
-    createPlayer(rating:$rating,name:$name){
+  mutation CreatePlayer($rating: Int, $name: String!) {
+    createPlayer(rating: $rating, name: $name) {
       id
       name
       createdAt
     }
   }
-  `;
+`;
 const findPlayer = gql`
   query getPlayer($name: String) {
     players(name: $name) {
@@ -16,22 +16,34 @@ const findPlayer = gql`
     }
   }
 `;
+interface CreateGameOptions {
+  blackID: number;
+  whiteID: number;
+  pgn: string;
+  opening?: string;
+  length: number;
+  playDate: string;
+  result: string;
+  averageRating: number;
+  whiteMoves: string[];
+  blackMoves: string[];
+}
 const createGame = gql`
   mutation CreateGame(
-    $blackId: Int
-    $whiteId: Int
-    $pgn: String
-    $opening: String
-    $length: Int
-    $playDate: String
-    $result: String
-    $averageRating: Int
-    $whiteMoves: [String]
-    $blackMoves: [String]
+    $blackID: Int!
+    $whiteID: Int!
+    $pgn: String!
+    $opening: String!
+    $length: Int!
+    $playDate: String!
+    $result: String!
+    $averageRating: Int!
+    $whiteMoves: [String!]!
+    $blackMoves: [String!]!
   ) {
     createGame(
-      blackID: $blackId
-      whiteID: $whiteId
+      blackID: $blackID
+      whiteID: $whiteID
       pgn: $pgn
       opening: $opening
       length: $length
@@ -56,6 +68,9 @@ const getPlayerIdOrCreate = async (
   rating?: number
 ) => {
   let { players } = await client.request(findPlayer, { name: name });
+  if (rating == undefined || isNaN(rating)) {
+    rating = 0;
+  }
   if (players.length == 1) {
     return players[0].id;
   }
@@ -67,19 +82,6 @@ const getPlayerIdOrCreate = async (
 };
 
 const uploadPGN = async (game: Game, client: GraphQLClient) => {
-  interface CreateGameOptions {
-    blackId: number;
-    whiteId: number;
-    pgn: string;
-    opening?: string;
-    length: number;
-    playDate: string;
-    result: string;
-    averageRating: number;
-    whiteMoves: string[];
-    blackMoves: string[];
-  }
-
   let length = Math.floor(game.blackMoves.length + game.whiteMoves.length);
   // let blackId = await getPlayerIdOrCreate(client, game.black, game.blackElo);
   // let whiteId = await getPlayerIdOrCreate(client, game.white, game.whiteElo);
@@ -87,22 +89,28 @@ const uploadPGN = async (game: Game, client: GraphQLClient) => {
     getPlayerIdOrCreate(client, game.black, game.blackElo),
     getPlayerIdOrCreate(client, game.white, game.whiteElo),
   ]);
+  console.log(blackId, whiteId);
+  let averageRating = Math.round((game.blackElo + game.whiteElo) / 2);
+  if (isNaN(averageRating)) {
+    averageRating = 1;
+  }
 
   let createGameOptions: CreateGameOptions = {
     pgn: game.pgn,
-    averageRating: Math.round((game.blackElo + game.whiteElo) / 2),
+    averageRating: averageRating,
     blackMoves: game.blackMoves,
     whiteMoves: game.whiteMoves,
     opening: game.eco,
     result: game.result,
     playDate: game.date,
-    blackId: blackId,
-    whiteId: whiteId,
+    blackID: blackId,
+    whiteID: whiteId,
     length: length,
   };
+  console.log(createGameOptions);
 
-  let result = await client.request(createGame);
-  console.log(result)
+  let result = await client.request(createGame, createGameOptions);
+  console.log(result);
 };
 
 export { uploadPGN, getPlayerIdOrCreate };

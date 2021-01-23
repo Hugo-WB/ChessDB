@@ -71,6 +71,7 @@ let GameResovler = class GameResovler {
     createGame(pgn, whiteID, blackID, blackMoves, whiteMoves, opening, length, playDate, result, averageRating, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                averageRating = averageRating !== null && averageRating !== void 0 ? averageRating : 1;
                 const whiteRef = em.getReference(Player_1.Player, whiteID);
                 const blackRef = em.getReference(Player_1.Player, blackID);
                 const game = em.create(Game_1.Game, {
@@ -136,15 +137,15 @@ __decorate([
 __decorate([
     type_graphql_1.Mutation(() => GameResponse),
     __param(0, type_graphql_1.Arg("pgn")),
-    __param(1, type_graphql_1.Arg("whiteID")),
-    __param(2, type_graphql_1.Arg("blackID")),
+    __param(1, type_graphql_1.Arg("whiteID", () => type_graphql_1.Int)),
+    __param(2, type_graphql_1.Arg("blackID", () => type_graphql_1.Int)),
     __param(3, type_graphql_1.Arg("blackMoves", () => [String])),
     __param(4, type_graphql_1.Arg("whiteMoves", () => [String])),
     __param(5, type_graphql_1.Arg("opening", () => String)),
     __param(6, type_graphql_1.Arg("length", () => type_graphql_1.Int)),
     __param(7, type_graphql_1.Arg("playDate", () => String)),
     __param(8, type_graphql_1.Arg("result", () => String)),
-    __param(9, type_graphql_1.Arg("averageRating", () => type_graphql_1.Int)),
+    __param(9, type_graphql_1.Arg("averageRating", () => type_graphql_1.Int, { nullable: true })),
     __param(10, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Number, Number, Array, Array, String, Number, String, String, Number, Object]),

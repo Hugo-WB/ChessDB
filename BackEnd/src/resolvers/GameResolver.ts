@@ -74,19 +74,21 @@ export class GameResovler {
   @Mutation(() => GameResponse)
   async createGame(
     @Arg("pgn") pgn: string,
-    @Arg("whiteID") whiteID: number,
-    @Arg("blackID") blackID: number,
+    @Arg("whiteID", () => Int) whiteID: number,
+    @Arg("blackID", () => Int) blackID: number,
     @Arg("blackMoves", () => [String]) blackMoves: string[],
     @Arg("whiteMoves", () => [String]) whiteMoves: string[],
     @Arg("opening", () => String) opening: string,
     @Arg("length", () => Int) length: number,
     @Arg("playDate", () => String) playDate: string,
     @Arg("result", () => String) result: string,
-    @Arg("averageRating", () => Int) averageRating: number,
+    @Arg("averageRating", () => Int, { nullable: true })
+    averageRating: number,
     @Ctx()
     { em }: MyContext
   ): Promise<GameResponse> {
     try {
+      averageRating = averageRating ?? 1;
       const whiteRef = em.getReference(Player, whiteID);
       const blackRef = em.getReference(Player, blackID);
       const game: Game = em.create(Game, {

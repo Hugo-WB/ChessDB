@@ -12,14 +12,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPlayerIdOrCreate = exports.uploadPGN = void 0;
 const graphql_request_1 = require("graphql-request");
 const createPlayer = graphql_request_1.gql `
-  mutation CreatePlayer($rating:Int,$name:String!){
-    createPlayer(rating:$rating,name:$name){
+  mutation CreatePlayer($rating: Int, $name: String!) {
+    createPlayer(rating: $rating, name: $name) {
       id
       name
       createdAt
     }
   }
-  `;
+`;
 const findPlayer = graphql_request_1.gql `
   query getPlayer($name: String) {
     players(name: $name) {
@@ -29,20 +29,20 @@ const findPlayer = graphql_request_1.gql `
 `;
 const createGame = graphql_request_1.gql `
   mutation CreateGame(
-    $blackId: Int
-    $whiteId: Int
-    $pgn: String
-    $opening: String
-    $length: Int
-    $playDate: String
-    $result: String
-    $averageRating: Int
-    $whiteMoves: [String]
-    $blackMoves: [String]
+    $blackID: Int!
+    $whiteID: Int!
+    $pgn: String!
+    $opening: String!
+    $length: Int!
+    $playDate: String!
+    $result: String!
+    $averageRating: Int!
+    $whiteMoves: [String!]!
+    $blackMoves: [String!]!
   ) {
     createGame(
-      blackID: $blackId
-      whiteID: $whiteId
+      blackID: $blackID
+      whiteID: $whiteID
       pgn: $pgn
       opening: $opening
       length: $length
@@ -62,6 +62,9 @@ const createGame = graphql_request_1.gql `
 `;
 const getPlayerIdOrCreate = (client, name, rating) => __awaiter(void 0, void 0, void 0, function* () {
     let { players } = yield client.request(findPlayer, { name: name });
+    if (rating == undefined || isNaN(rating)) {
+        rating = 0;
+    }
     if (players.length == 1) {
         return players[0].id;
     }
@@ -78,19 +81,25 @@ const uploadPGN = (game, client) => __awaiter(void 0, void 0, void 0, function* 
         getPlayerIdOrCreate(client, game.black, game.blackElo),
         getPlayerIdOrCreate(client, game.white, game.whiteElo),
     ]);
+    console.log(blackId, whiteId);
+    let averageRating = Math.round((game.blackElo + game.whiteElo) / 2);
+    if (isNaN(averageRating)) {
+        averageRating = 1;
+    }
     let createGameOptions = {
         pgn: game.pgn,
-        averageRating: Math.round((game.blackElo + game.whiteElo) / 2),
+        averageRating: averageRating,
         blackMoves: game.blackMoves,
         whiteMoves: game.whiteMoves,
         opening: game.eco,
         result: game.result,
         playDate: game.date,
-        blackId: blackId,
-        whiteId: whiteId,
+        blackID: blackId,
+        whiteID: whiteId,
         length: length,
     };
-    let result = yield client.request(createGame);
+    console.log(createGameOptions);
+    let result = yield client.request(createGame, createGameOptions);
     console.log(result);
 });
 exports.uploadPGN = uploadPGN;
