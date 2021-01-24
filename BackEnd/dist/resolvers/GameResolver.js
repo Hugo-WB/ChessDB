@@ -32,43 +32,53 @@ __decorate([
     __metadata("design:type", String)
 ], GameResponse.prototype, "error", void 0);
 __decorate([
-    type_graphql_1.Field(() => Game_1.Game, { nullable: true }),
-    __metadata("design:type", Game_1.Game)
-], GameResponse.prototype, "game", void 0);
+    type_graphql_1.Field(() => [Game_1.Game], { nullable: true }),
+    __metadata("design:type", Array)
+], GameResponse.prototype, "games", void 0);
 GameResponse = __decorate([
     type_graphql_1.ObjectType()
 ], GameResponse);
 let GameResovler = class GameResovler {
     games(gameId, playerId, maxLength, minLength, opening, limit, offset, result, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
-            let results = yield em
-                .createQueryBuilder(Game_1.Game)
-                .getKnexQuery()
-                .orderBy("average_rating", "desc")
-                .where(Object.assign({}, gameId === undefined ? null : { id: gameId }, opening === undefined ? null : { opening: opening }, result === undefined ? null : { result: result }))
-                .andWhere((builder) => {
-                if (playerId) {
-                    builder.where({ white_id: playerId }).orWhere({ black_id: playerId });
-                }
-                if (maxLength) {
-                    builder.where("length", "<=", maxLength);
-                }
-                if (minLength) {
-                    builder.where("length", ">=", minLength);
-                }
-            })
-                .offset(offset !== null && offset !== void 0 ? offset : 0)
-                .limit(Math.min(limit, 50));
-            let games = results.map((result) => __awaiter(this, void 0, void 0, function* () {
-                let game = em.map(Game_1.Game, result);
-                game.white = yield em.findOneOrFail(Player_1.Player, { id: game.white.id });
-                game.black = yield em.findOneOrFail(Player_1.Player, { id: game.black.id });
-                return game;
-            }));
-            return games;
+            try {
+                let results = yield em
+                    .createQueryBuilder(Game_1.Game)
+                    .getKnexQuery()
+                    .orderBy("average_rating", "desc")
+                    .where(Object.assign({}, gameId === undefined ? null : { id: gameId }, opening === undefined ? null : { opening: opening }, result === undefined ? null : { result: result }))
+                    .andWhere((builder) => {
+                    if (playerId) {
+                        builder
+                            .where({ white_id: playerId })
+                            .orWhere({ black_id: playerId });
+                    }
+                    if (maxLength) {
+                        builder.where("length", "<=", maxLength);
+                    }
+                    if (minLength) {
+                        builder.where("length", ">=", minLength);
+                    }
+                })
+                    .offset(offset !== null && offset !== void 0 ? offset : 0)
+                    .limit(Math.min(limit, 50));
+                let games = yield Promise.all(results.map((result) => __awaiter(this, void 0, void 0, function* () {
+                    let game = em.map(Game_1.Game, result);
+                    game.white = yield em.findOneOrFail(Player_1.Player, { id: game.white.id });
+                    game.black = yield em.findOneOrFail(Player_1.Player, { id: game.black.id });
+                    return game;
+                })));
+                console.log(games);
+                return { games: games };
+            }
+            catch (error) {
+                console.log(error);
+                return { error: error };
+            }
         });
     }
     createGame(pgn, whiteID, blackID, blackMoves, whiteMoves, opening, length, playDate, result, averageRating, { em }) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 averageRating = averageRating !== null && averageRating !== void 0 ? averageRating : 1;
@@ -87,9 +97,12 @@ let GameResovler = class GameResovler {
                     averageRating: averageRating,
                 });
                 yield em.persistAndFlush(game);
-                return { game };
+                return { games: [game] };
             }
             catch (error) {
+                if ((_a = error === null || error === void 0 ? void 0 : error.detail) === null || _a === void 0 ? void 0 : _a.includes("already exists")) {
+                    return { error: "This game already exists in the database" };
+                }
                 console.log(error);
                 return { error: error };
             }
@@ -120,7 +133,7 @@ let GameResovler = class GameResovler {
     }
 };
 __decorate([
-    type_graphql_1.Query(() => [Game_1.Game]),
+    type_graphql_1.Query(() => GameResponse),
     __param(0, type_graphql_1.Arg("id", () => type_graphql_1.Int, { nullable: true })),
     __param(1, type_graphql_1.Arg("playerId", () => type_graphql_1.Int, { nullable: true })),
     __param(2, type_graphql_1.Arg("maxLength", () => type_graphql_1.Int, { nullable: true })),

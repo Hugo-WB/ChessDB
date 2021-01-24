@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { MikroORM } from "@mikro-orm/core";
+import { MikroORM, RequestContext } from "@mikro-orm/core";
 
 import mikroConfig from "./mikro-orm.config";
 
@@ -16,61 +16,73 @@ import { UserResolver } from "./resolvers/UserResolver";
 // Session:
 import session from "express-session";
 import pgSession from "connect-pg-simple";
+import bodyParser from "body-parser";
 
 const main = async () => {
-  // MikroORM:
-  const orm = await MikroORM.init(mikroConfig);
-  await orm.getMigrator().up();
+  try {
+    // MikroORM:
+    const orm = await MikroORM.init(mikroConfig);
+    await orm.getMigrator().up();
 
-  // Express:
-  const app = express();
-  app.use(
-    cors({
-      origin: "http://localhost:3000",
-      credentials: true,
-    })
-  );
+    // Express:
+    const app = express();
+    app.use(
+      cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+      })
+    );
 
-  // Postgress session:
-  const conObject = {
-    user: "ChessDB",
-    password: "ChessDBQL",
-    host: "localhost",
-    port: 5432,
-    database: "ChessDB",
-  };
-  app.use(
-    session({
-      name: "ch",
-      store: new (pgSession(session))({ conObject: conObject }),
-      secret: "session_pkey",
-      resave: false,
-      cookie: {
-        // 30 days cookies
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        // protect csrf???
-        sameSite: "lax",
-        // only allow https:
-        // secure:__prod__
-      },
-      saveUninitialized: false,
-    })
-  );
+    // Postgress session:
+    const conObject = {
+      user: "ChessDB",
+      password: "ChessDBQL",
+      host: "localhost",
+      port: 5432,
+      database: "ChessDB",
+    };
 
-  // Apollo Server:
-  const apolloServer = new ApolloServer({
-    schema: await buildSchema({
-      resolvers: [GameResovler, PlayerResovler, UserResolver],
-    }),
-    context: ({ req, res }) => ({ em: orm.em, req: req, res: res }),
-  });
+    app.post("/graphql",bodyParser.json(),graphqlhtt)
 
-  apolloServer.applyMiddleware({ app, cors: false });
 
-  app.listen(4000, () => {
-    console.log("Server started on localhost:4000");
-  });
+    app.use(
+      session({
+        name: "ch",
+        store: new (pgSession(session))({ conObject: conObject }),
+        secret: "session_pkey",
+        resave: false,
+        cookie: {
+          // 30 days cookies
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+          // protect csrf???
+          sameSite: "lax",
+          // only allow https:
+          // secure:__prod__
+        },
+        saveUninitialized: false,
+      })
+    );
+
+    // Apollo Server:
+    const apolloServer = new ApolloServer({
+      schema: await buildSchema({
+        resolvers: [GameResovler, PlayerResovler, UserResolver],
+      }),
+      context: ({ req, res }) => ({ em: orm.em, req: req, res: res }),
+    });
+
+    apolloServer.applyMiddleware({ app, cors: false });
+
+    app.use((_, __, next) => {
+      RequestContext.create(orm.em, next);
+    });
+    app.listen(4000, () => {
+      console.log("Server started on localhost:4000");
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-main().catch((e) => console.log(e));
+main();

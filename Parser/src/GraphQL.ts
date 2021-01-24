@@ -54,7 +54,7 @@ const createGame = gql`
       blackMoves: $blackMoves
     ) {
       error
-      game {
+      games {
         id
         pgn
       }
@@ -81,36 +81,47 @@ const getPlayerIdOrCreate = async (
   return player.id;
 };
 
-const uploadPGN = async (game: Game, client: GraphQLClient) => {
-  let length = Math.floor(game.blackMoves.length + game.whiteMoves.length);
-  // let blackId = await getPlayerIdOrCreate(client, game.black, game.blackElo);
-  // let whiteId = await getPlayerIdOrCreate(client, game.white, game.whiteElo);
-  let [blackId, whiteId] = await Promise.all([
-    getPlayerIdOrCreate(client, game.black, game.blackElo),
-    getPlayerIdOrCreate(client, game.white, game.whiteElo),
-  ]);
-  console.log(blackId, whiteId);
-  let averageRating = Math.round((game.blackElo + game.whiteElo) / 2);
-  if (isNaN(averageRating)) {
-    averageRating = 1;
-  }
-
-  let createGameOptions: CreateGameOptions = {
-    pgn: game.pgn,
-    averageRating: averageRating,
-    blackMoves: game.blackMoves,
-    whiteMoves: game.whiteMoves,
-    opening: game.eco,
-    result: game.result,
-    playDate: game.date,
-    blackID: blackId,
-    whiteID: whiteId,
-    length: length,
-  };
-  console.log(createGameOptions);
-
-  let result = await client.request(createGame, createGameOptions);
-  console.log(result);
+const uploadPGNs = async (games: Game[], client: GraphQLClient) => {
+  let uploadPromises: Promise<any>[] = [];
+  games.forEach((game) => {
+    uploadPromises.push(uploadPGN(game, client));
+  });
+  let results = await Promise.all(uploadPromises);
+  console.log(results);
 };
 
-export { uploadPGN, getPlayerIdOrCreate };
+const uploadPGN = async (game: Game, client: GraphQLClient) => {
+  try {
+    let length = Math.floor(game.blackMoves.length + game.whiteMoves.length);
+    // let blackId = await getPlayerIdOrCreate(client, game.black, game.blackElo);
+    // let whiteId = await getPlayerIdOrCreate(client, game.white, game.whiteElo);
+    let [blackId, whiteId] = await Promise.all([
+      getPlayerIdOrCreate(client, game.black, game.blackElo),
+      getPlayerIdOrCreate(client, game.white, game.whiteElo),
+    ]);
+    let averageRating = Math.round((game.blackElo + game.whiteElo) / 2);
+    if (isNaN(averageRating)) {
+      averageRating = 1;
+    }
+
+    let createGameOptions: CreateGameOptions = {
+      pgn: game.pgn,
+      averageRating: averageRating,
+      blackMoves: game.blackMoves,
+      whiteMoves: game.whiteMoves,
+      opening: game.eco,
+      result: game.result,
+      playDate: game.date,
+      blackID: blackId,
+      whiteID: whiteId,
+      length: length,
+    };
+
+    let result = await client.request(createGame, createGameOptions);
+    return result;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export { uploadPGN, getPlayerIdOrCreate, uploadPGNs };

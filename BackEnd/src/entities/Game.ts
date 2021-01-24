@@ -22,7 +22,7 @@ export class Game {
   updatedAt = new Date();
 
   @Field(() => String)
-  @Property({ type: "text" })
+  @Property({ type: "text", unique: true })
   pgn!: string;
 
   @Field(() => Player)

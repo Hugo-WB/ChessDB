@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPlayerIdOrCreate = exports.uploadPGN = void 0;
+exports.uploadPGNs = exports.getPlayerIdOrCreate = exports.uploadPGN = void 0;
 const graphql_request_1 = require("graphql-request");
 const createPlayer = graphql_request_1.gql `
   mutation CreatePlayer($rating: Int, $name: String!) {
@@ -53,7 +53,7 @@ const createGame = graphql_request_1.gql `
       blackMoves: $blackMoves
     ) {
       error
-      game {
+      games {
         id
         pgn
       }
@@ -75,32 +75,44 @@ const getPlayerIdOrCreate = (client, name, rating) => __awaiter(void 0, void 0, 
     return player.id;
 });
 exports.getPlayerIdOrCreate = getPlayerIdOrCreate;
+const uploadPGNs = (games, client) => __awaiter(void 0, void 0, void 0, function* () {
+    let uploadPromises = [];
+    games.forEach((game) => {
+        uploadPromises.push(uploadPGN(game, client));
+    });
+    let results = yield Promise.all(uploadPromises);
+    console.log(results);
+});
+exports.uploadPGNs = uploadPGNs;
 const uploadPGN = (game, client) => __awaiter(void 0, void 0, void 0, function* () {
-    let length = Math.floor(game.blackMoves.length + game.whiteMoves.length);
-    let [blackId, whiteId] = yield Promise.all([
-        getPlayerIdOrCreate(client, game.black, game.blackElo),
-        getPlayerIdOrCreate(client, game.white, game.whiteElo),
-    ]);
-    console.log(blackId, whiteId);
-    let averageRating = Math.round((game.blackElo + game.whiteElo) / 2);
-    if (isNaN(averageRating)) {
-        averageRating = 1;
+    try {
+        let length = Math.floor(game.blackMoves.length + game.whiteMoves.length);
+        let [blackId, whiteId] = yield Promise.all([
+            getPlayerIdOrCreate(client, game.black, game.blackElo),
+            getPlayerIdOrCreate(client, game.white, game.whiteElo),
+        ]);
+        let averageRating = Math.round((game.blackElo + game.whiteElo) / 2);
+        if (isNaN(averageRating)) {
+            averageRating = 1;
+        }
+        let createGameOptions = {
+            pgn: game.pgn,
+            averageRating: averageRating,
+            blackMoves: game.blackMoves,
+            whiteMoves: game.whiteMoves,
+            opening: game.eco,
+            result: game.result,
+            playDate: game.date,
+            blackID: blackId,
+            whiteID: whiteId,
+            length: length,
+        };
+        let result = yield client.request(createGame, createGameOptions);
+        return result;
     }
-    let createGameOptions = {
-        pgn: game.pgn,
-        averageRating: averageRating,
-        blackMoves: game.blackMoves,
-        whiteMoves: game.whiteMoves,
-        opening: game.eco,
-        result: game.result,
-        playDate: game.date,
-        blackID: blackId,
-        whiteID: whiteId,
-        length: length,
-    };
-    console.log(createGameOptions);
-    let result = yield client.request(createGame, createGameOptions);
-    console.log(result);
+    catch (error) {
+        return { error: error };
+    }
 });
 exports.uploadPGN = uploadPGN;
 //# sourceMappingURL=GraphQL.js.map

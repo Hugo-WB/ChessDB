@@ -9,20 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const GraphQL_1 = require("./GraphQL");
-const PgnParser_1 = require("./PgnParser/PgnParser");
-const graphql_request_1 = require("graphql-request");
-const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const client = new graphql_request_1.GraphQLClient("http://localhost:4000/graphql");
-        let games = yield PgnParser_1.parsePGN("./assets/PgnMentor/players/Adams.pgn");
-        console.log(games);
-        let result = yield GraphQL_1.uploadPGNs(games.slice(0, 10), client);
-        console.log(result);
+exports.Migration20210124161858 = void 0;
+const migrations_1 = require("@mikro-orm/migrations");
+class Migration20210124161858 extends migrations_1.Migration {
+    up() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.addSql('alter table "game" add constraint "game_pgn_unique" unique ("pgn");');
+        });
     }
-    catch (error) {
-        console.log(error);
-    }
-});
-main();
-//# sourceMappingURL=index.js.map
+}
+exports.Migration20210124161858 = Migration20210124161858;
+//# sourceMappingURL=Migration20210124161858.js.map

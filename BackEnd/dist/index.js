@@ -24,43 +24,53 @@ const PlayerResolver_1 = require("./resolvers/PlayerResolver");
 const UserResolver_1 = require("./resolvers/UserResolver");
 const express_session_1 = __importDefault(require("express-session"));
 const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
+const body_parser_1 = __importDefault(require("body-parser"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
-    yield orm.getMigrator().up();
-    const app = express_1.default();
-    app.use(cors_1.default({
-        origin: "http://localhost:3000",
-        credentials: true,
-    }));
-    const conObject = {
-        user: "ChessDB",
-        password: "ChessDBQL",
-        host: "localhost",
-        port: 5432,
-        database: "ChessDB",
-    };
-    app.use(express_session_1.default({
-        name: "ch",
-        store: new (connect_pg_simple_1.default(express_session_1.default))({ conObject: conObject }),
-        secret: "session_pkey",
-        resave: false,
-        cookie: {
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-            httpOnly: true,
-            sameSite: "lax",
-        },
-        saveUninitialized: false,
-    }));
-    const apolloServer = new apollo_server_express_1.ApolloServer({
-        schema: yield type_graphql_1.buildSchema({
-            resolvers: [GameResolver_1.GameResovler, PlayerResolver_1.PlayerResovler, UserResolver_1.UserResolver],
-        }),
-        context: ({ req, res }) => ({ em: orm.em, req: req, res: res }),
-    });
-    apolloServer.applyMiddleware({ app, cors: false });
-    app.listen(4000, () => {
-        console.log("Server started on localhost:4000");
-    });
+    try {
+        const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
+        yield orm.getMigrator().up();
+        const app = express_1.default();
+        app.use(cors_1.default({
+            origin: "http://localhost:3000",
+            credentials: true,
+        }));
+        const conObject = {
+            user: "ChessDB",
+            password: "ChessDBQL",
+            host: "localhost",
+            port: 5432,
+            database: "ChessDB",
+        };
+        app.post("/graphql", body_parser_1.default.json(), graphqlhtt);
+        app.use(express_session_1.default({
+            name: "ch",
+            store: new (connect_pg_simple_1.default(express_session_1.default))({ conObject: conObject }),
+            secret: "session_pkey",
+            resave: false,
+            cookie: {
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+                httpOnly: true,
+                sameSite: "lax",
+            },
+            saveUninitialized: false,
+        }));
+        const apolloServer = new apollo_server_express_1.ApolloServer({
+            schema: yield type_graphql_1.buildSchema({
+                resolvers: [GameResolver_1.GameResovler, PlayerResolver_1.PlayerResovler, UserResolver_1.UserResolver],
+            }),
+            context: ({ req, res }) => ({ em: orm.em, req: req, res: res }),
+        });
+        apolloServer.applyMiddleware({ app, cors: false });
+        app.use((_, __, next) => {
+            core_1.RequestContext.create(orm.em, next);
+        });
+        app.listen(4000, () => {
+            console.log("Server started on localhost:4000");
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
 });
-main().catch((e) => console.log(e));
+main();
 //# sourceMappingURL=index.js.map
