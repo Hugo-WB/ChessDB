@@ -24,26 +24,52 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlayerResovler = void 0;
 const Player_1 = require("../entities/Player");
 const type_graphql_1 = require("type-graphql");
+let PlayerResponse = class PlayerResponse {
+};
+__decorate([
+    type_graphql_1.Field(() => String, { nullable: true }),
+    __metadata("design:type", String)
+], PlayerResponse.prototype, "error", void 0);
+__decorate([
+    type_graphql_1.Field(() => [Player_1.Player], { nullable: true }),
+    __metadata("design:type", Array)
+], PlayerResponse.prototype, "players", void 0);
+PlayerResponse = __decorate([
+    type_graphql_1.ObjectType()
+], PlayerResponse);
 let PlayerResovler = class PlayerResovler {
-    players(id, name, { em }) {
+    players(id, name, limit, offset, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             let results = yield em
                 .createQueryBuilder(Player_1.Player)
                 .getKnexQuery()
-                .where(Object.assign({}, id === undefined ? null : { id }, name === undefined ? null : { name }));
+                .where(Object.assign({}, id === undefined ? null : { id }, name === undefined ? null : { name }))
+                .orderBy("rating", "desc")
+                .offset(offset !== null && offset !== void 0 ? offset : 0)
+                .limit(Math.min(limit, 30));
             let players = results.map((player) => em.map(Player_1.Player, player));
             console.log;
             return players;
         });
     }
     createPlayer(name, rating, { em }) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const player = em.create(Player_1.Player, {
-                name: name,
-                rating: rating,
-            });
-            yield em.persistAndFlush(player);
-            return player;
+            try {
+                const player = em.create(Player_1.Player, {
+                    name: name,
+                    rating: rating,
+                });
+                yield em.persistAndFlush(player);
+                return { players: [player] };
+            }
+            catch (error) {
+                if ((_a = error === null || error === void 0 ? void 0 : error.detail) === null || _a === void 0 ? void 0 : _a.includes("already exists")) {
+                    return { error: "This player already exists in the database" };
+                }
+                console.log(error);
+                return { error: error };
+            }
         });
     }
     updatePlayer(id, name, rating, { em }) {
@@ -73,13 +99,15 @@ __decorate([
     type_graphql_1.Query(() => [Player_1.Player]),
     __param(0, type_graphql_1.Arg("id", () => type_graphql_1.Int, { nullable: true })),
     __param(1, type_graphql_1.Arg("name", { nullable: true })),
-    __param(2, type_graphql_1.Ctx()),
+    __param(2, type_graphql_1.Arg("limit", () => type_graphql_1.Int, { nullable: true, defaultValue: 20 })),
+    __param(3, type_graphql_1.Arg("offset", () => type_graphql_1.Int, { nullable: true })),
+    __param(4, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:paramtypes", [Number, String, Number, Number, Object]),
     __metadata("design:returntype", Promise)
 ], PlayerResovler.prototype, "players", null);
 __decorate([
-    type_graphql_1.Mutation(() => Player_1.Player, { nullable: true }),
+    type_graphql_1.Mutation(() => PlayerResponse, { nullable: true }),
     __param(0, type_graphql_1.Arg("name")),
     __param(1, type_graphql_1.Arg("rating", () => type_graphql_1.Int, { nullable: true, defaultValue: 0 })),
     __param(2, type_graphql_1.Ctx()),

@@ -61,14 +61,13 @@ let GameResovler = class GameResovler {
                     }
                 })
                     .offset(offset !== null && offset !== void 0 ? offset : 0)
-                    .limit(Math.min(limit, 50));
+                    .limit(Math.min(limit, 30));
                 let games = yield Promise.all(results.map((result) => __awaiter(this, void 0, void 0, function* () {
                     let game = em.map(Game_1.Game, result);
                     game.white = yield em.findOneOrFail(Player_1.Player, { id: game.white.id });
                     game.black = yield em.findOneOrFail(Player_1.Player, { id: game.black.id });
                     return game;
                 })));
-                console.log(games);
                 return { games: games };
             }
             catch (error) {
@@ -115,7 +114,6 @@ let GameResovler = class GameResovler {
                 })
                     .returning("*");
                 let mapped = em.map(Game_1.Game, out[0]);
-                console.log(mapped);
                 return { games: [mapped] };
             }
             catch (error) {

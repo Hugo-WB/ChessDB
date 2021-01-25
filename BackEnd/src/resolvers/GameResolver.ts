@@ -64,7 +64,7 @@ export class GameResovler {
           }
         })
         .offset(offset ?? 0)
-        .limit(Math.min(limit, 50));
+        .limit(Math.min(limit, 30));
       let games: Game[] = await Promise.all(
         results.map(async (result: any) => {
           let game: Game = em.map(Game, result);
@@ -73,7 +73,6 @@ export class GameResovler {
           return game;
         })
       );
-      console.log(games);
       return { games: games };
     } catch (error) {
       console.log(error);
@@ -132,7 +131,6 @@ export class GameResovler {
         })
         .returning("*");
       let mapped = em.map(Game, out[0]);
-      console.log(mapped);
       return { games: [mapped] };
     } catch (error) {
       if (error?.detail?.includes("already exists")) {

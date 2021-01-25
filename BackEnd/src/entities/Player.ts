@@ -10,7 +10,7 @@ export class Player {
   id!: number;
 
   @Field(() => String)
-  @Property({ type: "text" })
+  @Property({ type: "text",unique:true })
   name!: string;
 
   @Field(() => String)

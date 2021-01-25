@@ -3,9 +3,12 @@ import { request, gql, GraphQLClient } from "graphql-request";
 const createPlayer = gql`
   mutation CreatePlayer($rating: Int, $name: String!) {
     createPlayer(rating: $rating, name: $name) {
-      id
-      name
-      createdAt
+      error
+      players {
+        id
+        name
+        createdAt
+      }
     }
   }
 `;
@@ -66,19 +69,27 @@ const getPlayerIdOrCreate = async (
   client: GraphQLClient,
   name: string,
   rating?: number
-) => {
-  let { players } = await client.request(findPlayer, { name: name });
-  if (rating == undefined || isNaN(rating)) {
-    rating = 0;
+): Promise<any> => {
+  try {
+    let { players } = await client.request(findPlayer, { name: name });
+    if (rating == undefined || isNaN(rating)) {
+      rating = 0;
+    }
+    if (players.length == 1) {
+      return players[0].id;
+    }
+    let player = await client.request(createPlayer, {
+      name: name,
+      rating: rating,
+    });
+    if (player.createPlayer?.error?.includes("already exists in")) {
+      return await getPlayerIdOrCreate(client, name, rating);
+    }
+    return player.createPlayer.players[0].id;
+  } catch (error) {
+    console.log(error)
+    return error;
   }
-  if (players.length == 1) {
-    return players[0].id;
-  }
-  let player = await client.request(createPlayer, {
-    name: name,
-    rating: rating,
-  });
-  return player.createPlayer.id;
 };
 
 const uploadPGNs = async (games: Game[], client: GraphQLClient) => {
@@ -86,8 +97,9 @@ const uploadPGNs = async (games: Game[], client: GraphQLClient) => {
   games.forEach((game) => {
     uploadPromises.push(uploadPGN(game, client));
   });
+  // console.log("Upload PGNs promises sent")
   let results = await Promise.all(uploadPromises);
-  console.log(results);
+  return results;
 };
 
 const uploadPGN = async (game: Game, client: GraphQLClient) => {
@@ -118,9 +130,7 @@ const uploadPGN = async (game: Game, client: GraphQLClient) => {
     };
 
     let result = await client.request(createGame, createGameOptions);
-    // console.log(result);
-    console.log(result.createGame.games);
-    return result;
+    return result.createGame;
   } catch (error) {
     return { error: error };
   }

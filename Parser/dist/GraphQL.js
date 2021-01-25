@@ -14,9 +14,12 @@ const graphql_request_1 = require("graphql-request");
 const createPlayer = graphql_request_1.gql `
   mutation CreatePlayer($rating: Int, $name: String!) {
     createPlayer(rating: $rating, name: $name) {
-      id
-      name
-      createdAt
+      error
+      players {
+        id
+        name
+        createdAt
+      }
     }
   }
 `;
@@ -61,18 +64,28 @@ const createGame = graphql_request_1.gql `
   }
 `;
 const getPlayerIdOrCreate = (client, name, rating) => __awaiter(void 0, void 0, void 0, function* () {
-    let { players } = yield client.request(findPlayer, { name: name });
-    if (rating == undefined || isNaN(rating)) {
-        rating = 0;
+    var _a, _b;
+    try {
+        let { players } = yield client.request(findPlayer, { name: name });
+        if (rating == undefined || isNaN(rating)) {
+            rating = 0;
+        }
+        if (players.length == 1) {
+            return players[0].id;
+        }
+        let player = yield client.request(createPlayer, {
+            name: name,
+            rating: rating,
+        });
+        if ((_b = (_a = player.createPlayer) === null || _a === void 0 ? void 0 : _a.error) === null || _b === void 0 ? void 0 : _b.includes("already exists in")) {
+            return yield getPlayerIdOrCreate(client, name, rating);
+        }
+        return player.createPlayer.players[0].id;
     }
-    if (players.length == 1) {
-        return players[0].id;
+    catch (error) {
+        console.log(error);
+        return error;
     }
-    let player = yield client.request(createPlayer, {
-        name: name,
-        rating: rating,
-    });
-    return player.createPlayer.id;
 });
 exports.getPlayerIdOrCreate = getPlayerIdOrCreate;
 const uploadPGNs = (games, client) => __awaiter(void 0, void 0, void 0, function* () {
@@ -81,7 +94,7 @@ const uploadPGNs = (games, client) => __awaiter(void 0, void 0, void 0, function
         uploadPromises.push(uploadPGN(game, client));
     });
     let results = yield Promise.all(uploadPromises);
-    console.log(results);
+    return results;
 });
 exports.uploadPGNs = uploadPGNs;
 const uploadPGN = (game, client) => __awaiter(void 0, void 0, void 0, function* () {
@@ -108,8 +121,7 @@ const uploadPGN = (game, client) => __awaiter(void 0, void 0, void 0, function* 
             length: length,
         };
         let result = yield client.request(createGame, createGameOptions);
-        console.log(result.createGame.games);
-        return result;
+        return result.createGame;
     }
     catch (error) {
         return { error: error };
