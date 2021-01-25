@@ -20,20 +20,18 @@ import Results from "../components/Results";
 import { useQuery } from "@apollo/client";
 import { GetGamesDocument, useGetGamesQuery } from "../graphql/graphql";
 
-
 interface Props {}
 
 const index = (props: Props) => {
-
-  let {error,loading,data} = useGetGamesQuery();
-  if (!data) return "Loading..."
+  let { error, loading, data } = useGetGamesQuery();
+  if (!data) return "Loading...";
   return (
     <>
       <Pane>
         <Heading>ChessDB</Heading>
       </Pane>
       <Pane>
-        {/* {data.games.map((game)=>game.pgn)} */}
+        <Results />
       </Pane>
     </>
   );

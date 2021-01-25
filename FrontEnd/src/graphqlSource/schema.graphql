@@ -1,0 +1,100 @@
+# Exposes a URL that specifies the behaviour of this scalar.
+directive @specifiedBy(
+  # The URL that specifies the behaviour of this scalar.
+  url: String!
+) on SCALAR
+type FieldError {
+  field: String!
+  message: String!
+}
+
+type Game {
+  id: Int!
+  playedAt: String!
+  createdAt: String!
+  updatedAt: String!
+  pgn: String!
+  white: Player!
+  black: Player!
+  result: String!
+  length: Int!
+  opening: String!
+  whiteMoves: [String!]!
+  blackMoves: [String!]!
+  averageRating: Int!
+}
+
+type GameResponse {
+  error: String
+  games: [Game!]
+}
+
+type Mutation {
+  createGame(
+    averageRating: Int
+    result: String!
+    playDate: String!
+    length: Int!
+    opening: String!
+    whiteMoves: [String!]!
+    blackMoves: [String!]!
+    blackID: Int!
+    whiteID: Int!
+    pgn: String!
+  ): GameResponse!
+  updateGame(pgn: String, id: Float!): Game
+  deleteGame(id: Float!): Game
+  createPlayer(rating: Int = 0, name: String!): PlayerResponse
+  updatePlayer(rating: Int!, name: String!, id: Int!): Player
+  deletePlayer(id: Int!): Player
+  register(options: UsernamePasswordInput!): User!
+  login(options: UsernamePasswordInput!): UserResponse!
+}
+
+type Player {
+  id: Int!
+  name: String!
+  createdAt: String!
+  updatedAt: String!
+  rating: Int!
+  profile: String!
+  links: [String!]!
+}
+
+type PlayerResponse {
+  error: String
+  players: [Player!]
+}
+
+type Query {
+  games(
+    result: String
+    offset: Int
+    limit: Int = 20
+    opening: String
+    minLength: Int
+    maxLength: Int
+    playerId: Int
+    id: Int
+  ): GameResponse!
+  players(offset: Int, limit: Int = 20, name: String, id: Int): [Player!]!
+  me: User
+}
+
+type User {
+  id: Int!
+  username: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+input UsernamePasswordInput {
+  username: String!
+  password: String!
+}
+
+type UserResponse {
+  errors: [FieldError!]
+  user: User
+}
+

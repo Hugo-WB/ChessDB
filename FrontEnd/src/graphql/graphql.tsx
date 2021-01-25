@@ -15,31 +15,52 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
-  games: Array<Game>;
-  game?: Maybe<Game>;
+  games: GameResponse;
   players: Array<Player>;
-  player?: Maybe<Player>;
   me?: Maybe<User>;
 };
 
 
-export type QueryGameArgs = {
-  id: Scalars['Float'];
+export type QueryGamesArgs = {
+  result?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+  opening?: Maybe<Scalars['String']>;
+  minLength?: Maybe<Scalars['Int']>;
+  maxLength?: Maybe<Scalars['Int']>;
+  playerId?: Maybe<Scalars['Int']>;
+  id?: Maybe<Scalars['Int']>;
 };
 
 
-export type QueryPlayerArgs = {
-  id: Scalars['Float'];
+export type QueryPlayersArgs = {
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['Int']>;
+};
+
+export type GameResponse = {
+  __typename?: 'GameResponse';
+  error?: Maybe<Scalars['String']>;
+  games?: Maybe<Array<Game>>;
 };
 
 export type Game = {
   __typename?: 'Game';
   id: Scalars['Int'];
+  playedAt: Scalars['String'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   pgn: Scalars['String'];
   white: Player;
   black: Player;
+  result: Scalars['String'];
+  length: Scalars['Int'];
+  opening: Scalars['String'];
+  whiteMoves: Array<Scalars['String']>;
+  blackMoves: Array<Scalars['String']>;
+  averageRating: Scalars['Int'];
 };
 
 export type Player = {
@@ -66,7 +87,7 @@ export type Mutation = {
   createGame: GameResponse;
   updateGame?: Maybe<Game>;
   deleteGame?: Maybe<Game>;
-  createPlayer?: Maybe<Player>;
+  createPlayer?: Maybe<PlayerResponse>;
   updatePlayer?: Maybe<Player>;
   deletePlayer?: Maybe<Player>;
   register: User;
@@ -75,8 +96,15 @@ export type Mutation = {
 
 
 export type MutationCreateGameArgs = {
-  blackID: Scalars['Float'];
-  whiteID: Scalars['Float'];
+  averageRating?: Maybe<Scalars['Int']>;
+  result: Scalars['String'];
+  playDate: Scalars['String'];
+  length: Scalars['Int'];
+  opening: Scalars['String'];
+  whiteMoves: Array<Scalars['String']>;
+  blackMoves: Array<Scalars['String']>;
+  blackID: Scalars['Int'];
+  whiteID: Scalars['Int'];
   pgn: Scalars['String'];
 };
 
@@ -93,21 +121,20 @@ export type MutationDeleteGameArgs = {
 
 
 export type MutationCreatePlayerArgs = {
-  games?: Maybe<Array<Scalars['Int']>>;
-  rating: Scalars['Float'];
+  rating?: Maybe<Scalars['Int']>;
   name: Scalars['String'];
 };
 
 
 export type MutationUpdatePlayerArgs = {
-  rating: Scalars['Float'];
+  rating: Scalars['Int'];
   name: Scalars['String'];
-  id: Scalars['Float'];
+  id: Scalars['Int'];
 };
 
 
 export type MutationDeletePlayerArgs = {
-  id: Scalars['Float'];
+  id: Scalars['Int'];
 };
 
 
@@ -120,10 +147,10 @@ export type MutationLoginArgs = {
   options: UsernamePasswordInput;
 };
 
-export type GameResponse = {
-  __typename?: 'GameResponse';
+export type PlayerResponse = {
+  __typename?: 'PlayerResponse';
   error?: Maybe<Scalars['String']>;
-  game?: Maybe<Game>;
+  players?: Maybe<Array<Player>>;
 };
 
 export type UsernamePasswordInput = {
@@ -143,37 +170,129 @@ export type FieldError = {
   message: Scalars['String'];
 };
 
-export type GetGamesQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetGamesQueryVariables = Exact<{
+  result?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+  opening?: Maybe<Scalars['String']>;
+  minLength?: Maybe<Scalars['Int']>;
+  maxLength?: Maybe<Scalars['Int']>;
+  playerId?: Maybe<Scalars['Int']>;
+  id?: Maybe<Scalars['Int']>;
+}>;
 
 
 export type GetGamesQuery = (
   { __typename?: 'Query' }
-  & { games: Array<(
-    { __typename?: 'Game' }
-    & Pick<Game, 'id' | 'pgn'>
-    & { white: (
-      { __typename?: 'Player' }
-      & Pick<Player, 'id' | 'name'>
-    ), black: (
-      { __typename?: 'Player' }
-      & Pick<Player, 'id' | 'name'>
-    ) }
+  & { games: (
+    { __typename?: 'GameResponse' }
+    & Pick<GameResponse, 'error'>
+    & { games?: Maybe<Array<(
+      { __typename?: 'Game' }
+      & Pick<Game, 'id' | 'playedAt' | 'averageRating' | 'result'>
+      & { white: (
+        { __typename?: 'Player' }
+        & Pick<Player, 'id' | 'name' | 'rating'>
+      ), black: (
+        { __typename?: 'Player' }
+        & Pick<Player, 'id' | 'name' | 'rating'>
+      ) }
+    )>> }
+  ) }
+);
+
+export type GetDetailedGameQueryVariables = Exact<{
+  result?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+  opening?: Maybe<Scalars['String']>;
+  minLength?: Maybe<Scalars['Int']>;
+  maxLength?: Maybe<Scalars['Int']>;
+  playerId?: Maybe<Scalars['Int']>;
+  id?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type GetDetailedGameQuery = (
+  { __typename?: 'Query' }
+  & { games: (
+    { __typename?: 'GameResponse' }
+    & Pick<GameResponse, 'error'>
+    & { games?: Maybe<Array<(
+      { __typename?: 'Game' }
+      & Pick<Game, 'id' | 'playedAt' | 'averageRating' | 'result' | 'whiteMoves' | 'blackMoves' | 'pgn' | 'length' | 'opening'>
+      & { white: (
+        { __typename?: 'Player' }
+        & Pick<Player, 'id' | 'name' | 'rating'>
+      ), black: (
+        { __typename?: 'Player' }
+        & Pick<Player, 'id' | 'name' | 'rating'>
+      ) }
+    )>> }
+  ) }
+);
+
+export type GetPlayersQueryVariables = Exact<{
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type GetPlayersQuery = (
+  { __typename?: 'Query' }
+  & { players: Array<(
+    { __typename?: 'Player' }
+    & Pick<Player, 'id' | 'name' | 'rating'>
+  )> }
+);
+
+export type GetDetailedPlayerQueryVariables = Exact<{
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type GetDetailedPlayerQuery = (
+  { __typename?: 'Query' }
+  & { players: Array<(
+    { __typename?: 'Player' }
+    & Pick<Player, 'id' | 'name' | 'rating' | 'createdAt' | 'profile' | 'links'>
   )> }
 );
 
 
 export const GetGamesDocument = gql`
-    query getGames {
-  games {
-    id
-    pgn
-    white {
+    query GetGames($result: String, $offset: Int, $limit: Int, $opening: String, $minLength: Int, $maxLength: Int, $playerId: Int, $id: Int) {
+  games(
+    result: $result
+    offset: $offset
+    limit: $limit
+    opening: $opening
+    minLength: $minLength
+    maxLength: $maxLength
+    playerId: $playerId
+    id: $id
+  ) {
+    error
+    games {
       id
-      name
-    }
-    black {
-      id
-      name
+      playedAt
+      averageRating
+      result
+      white {
+        id
+        name
+        rating
+      }
+      black {
+        id
+        name
+        rating
+      }
     }
   }
 }
@@ -191,6 +310,14 @@ export const GetGamesDocument = gql`
  * @example
  * const { data, loading, error } = useGetGamesQuery({
  *   variables: {
+ *      result: // value for 'result'
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      opening: // value for 'opening'
+ *      minLength: // value for 'minLength'
+ *      maxLength: // value for 'maxLength'
+ *      playerId: // value for 'playerId'
+ *      id: // value for 'id'
  *   },
  * });
  */
@@ -203,3 +330,152 @@ export function useGetGamesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetGamesQueryHookResult = ReturnType<typeof useGetGamesQuery>;
 export type GetGamesLazyQueryHookResult = ReturnType<typeof useGetGamesLazyQuery>;
 export type GetGamesQueryResult = Apollo.QueryResult<GetGamesQuery, GetGamesQueryVariables>;
+export const GetDetailedGameDocument = gql`
+    query GetDetailedGame($result: String, $offset: Int, $limit: Int, $opening: String, $minLength: Int, $maxLength: Int, $playerId: Int, $id: Int) {
+  games(
+    result: $result
+    offset: $offset
+    limit: $limit
+    opening: $opening
+    minLength: $minLength
+    maxLength: $maxLength
+    playerId: $playerId
+    id: $id
+  ) {
+    error
+    games {
+      id
+      playedAt
+      averageRating
+      result
+      whiteMoves
+      blackMoves
+      pgn
+      length
+      opening
+      white {
+        id
+        name
+        rating
+      }
+      black {
+        id
+        name
+        rating
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDetailedGameQuery__
+ *
+ * To run a query within a React component, call `useGetDetailedGameQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDetailedGameQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDetailedGameQuery({
+ *   variables: {
+ *      result: // value for 'result'
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      opening: // value for 'opening'
+ *      minLength: // value for 'minLength'
+ *      maxLength: // value for 'maxLength'
+ *      playerId: // value for 'playerId'
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetDetailedGameQuery(baseOptions?: Apollo.QueryHookOptions<GetDetailedGameQuery, GetDetailedGameQueryVariables>) {
+        return Apollo.useQuery<GetDetailedGameQuery, GetDetailedGameQueryVariables>(GetDetailedGameDocument, baseOptions);
+      }
+export function useGetDetailedGameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDetailedGameQuery, GetDetailedGameQueryVariables>) {
+          return Apollo.useLazyQuery<GetDetailedGameQuery, GetDetailedGameQueryVariables>(GetDetailedGameDocument, baseOptions);
+        }
+export type GetDetailedGameQueryHookResult = ReturnType<typeof useGetDetailedGameQuery>;
+export type GetDetailedGameLazyQueryHookResult = ReturnType<typeof useGetDetailedGameLazyQuery>;
+export type GetDetailedGameQueryResult = Apollo.QueryResult<GetDetailedGameQuery, GetDetailedGameQueryVariables>;
+export const GetPlayersDocument = gql`
+    query GetPlayers($offset: Int, $limit: Int, $name: String, $id: Int) {
+  players(offset: $offset, limit: $limit, name: $name, id: $id) {
+    id
+    name
+    rating
+  }
+}
+    `;
+
+/**
+ * __useGetPlayersQuery__
+ *
+ * To run a query within a React component, call `useGetPlayersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPlayersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPlayersQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      name: // value for 'name'
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetPlayersQuery(baseOptions?: Apollo.QueryHookOptions<GetPlayersQuery, GetPlayersQueryVariables>) {
+        return Apollo.useQuery<GetPlayersQuery, GetPlayersQueryVariables>(GetPlayersDocument, baseOptions);
+      }
+export function useGetPlayersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPlayersQuery, GetPlayersQueryVariables>) {
+          return Apollo.useLazyQuery<GetPlayersQuery, GetPlayersQueryVariables>(GetPlayersDocument, baseOptions);
+        }
+export type GetPlayersQueryHookResult = ReturnType<typeof useGetPlayersQuery>;
+export type GetPlayersLazyQueryHookResult = ReturnType<typeof useGetPlayersLazyQuery>;
+export type GetPlayersQueryResult = Apollo.QueryResult<GetPlayersQuery, GetPlayersQueryVariables>;
+export const GetDetailedPlayerDocument = gql`
+    query GetDetailedPlayer($offset: Int, $limit: Int, $name: String, $id: Int) {
+  players(offset: $offset, limit: $limit, name: $name, id: $id) {
+    id
+    name
+    rating
+    createdAt
+    profile
+    links
+  }
+}
+    `;
+
+/**
+ * __useGetDetailedPlayerQuery__
+ *
+ * To run a query within a React component, call `useGetDetailedPlayerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDetailedPlayerQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDetailedPlayerQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      name: // value for 'name'
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetDetailedPlayerQuery(baseOptions?: Apollo.QueryHookOptions<GetDetailedPlayerQuery, GetDetailedPlayerQueryVariables>) {
+        return Apollo.useQuery<GetDetailedPlayerQuery, GetDetailedPlayerQueryVariables>(GetDetailedPlayerDocument, baseOptions);
+      }
+export function useGetDetailedPlayerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDetailedPlayerQuery, GetDetailedPlayerQueryVariables>) {
+          return Apollo.useLazyQuery<GetDetailedPlayerQuery, GetDetailedPlayerQueryVariables>(GetDetailedPlayerDocument, baseOptions);
+        }
+export type GetDetailedPlayerQueryHookResult = ReturnType<typeof useGetDetailedPlayerQuery>;
+export type GetDetailedPlayerLazyQueryHookResult = ReturnType<typeof useGetDetailedPlayerLazyQuery>;
+export type GetDetailedPlayerQueryResult = Apollo.QueryResult<GetDetailedPlayerQuery, GetDetailedPlayerQueryVariables>;

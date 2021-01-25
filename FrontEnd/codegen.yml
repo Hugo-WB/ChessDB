@@ -1,7 +1,7 @@
 overwrite: true
 schema: "http://localhost:4000/graphql"
-# documents: "src/**/*.graphql"
-documents: "./src/graphqlSource/*.ts"
+documents: "src/*/*.graphql"
+# documents: "./src/graphqlSource/*.ts"
 generates:
   src/graphql/graphql.tsx:
     plugins:

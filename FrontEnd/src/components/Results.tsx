@@ -1,27 +1,26 @@
 import { Spinner } from "evergreen-ui";
 import React, { useEffect, useState } from "react";
+import { GetGamesDocument, useGetGamesQuery } from "../graphql/graphql";
 import { AdvancedSearch, BasicSearch } from "../pages/types";
+import GameCard from "./GameCard";
 
-interface Props {
-  search: BasicSearch | AdvancedSearch;
-}
-
+interface Props {}
 
 const Results = (props: Props) => {
-  const [results, setResults] = useState<any[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [request, setRequest] = useState();
-  useEffect(() => {
-  }, []);
+  const { loading, error, data } = useGetGamesQuery({ variables: {limit:5} });
+
+  if (loading) {
+    return <div>loading</div>;
+  }
+  if (error) {
+    <div>error</div>;
+  }
+  console.log(data);
   return (
     <div>
-      {results.length == 0 ? (
-        <Spinner />
-      ) : (
-        results.map((game) => {
-          <div>potato</div>;
-        })
-      )}
+      {data?.games.games?.map((game) => {
+        return <GameCard game={game} />;
+      })}
     </div>
   );
 };

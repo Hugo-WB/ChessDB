@@ -1,0 +1,104 @@
+query GetGames(
+  $result: String
+  $offset: Int
+  $limit: Int
+  $opening: String
+  $minLength: Int
+  $maxLength: Int
+  $playerId: Int
+  $id: Int
+) {
+  games(
+    result: $result
+    offset: $offset
+    limit: $limit
+    opening: $opening
+    minLength: $minLength
+    maxLength: $maxLength
+    playerId: $playerId
+    id: $id
+  ) {
+    error
+    games {
+      id
+      playedAt
+      averageRating
+      result
+      white {
+        id
+        name
+        rating
+      }
+      black {
+        id
+        name
+        rating
+      }
+    }
+  }
+}
+
+
+query GetDetailedGame(
+  $result: String
+  $offset: Int
+  $limit: Int
+  $opening: String
+  $minLength: Int
+  $maxLength: Int
+  $playerId: Int
+  $id: Int
+) {
+  games(
+    result: $result
+    offset: $offset
+    limit: $limit
+    opening: $opening
+    minLength: $minLength
+    maxLength: $maxLength
+    playerId: $playerId
+    id: $id
+  ) {
+    error
+    games {
+      id
+      playedAt
+      averageRating
+      result
+      whiteMoves
+      blackMoves
+      pgn
+      length
+      opening
+      white {
+        id
+        name
+        rating
+      }
+      black {
+        id
+        name
+        rating
+      }
+    }
+  }
+}
+
+query GetPlayers($offset: Int, $limit: Int, $name: String, $id: Int) {
+  players(offset: $offset, limit: $limit, name: $name, id: $id) {
+    id
+    name
+    rating
+  }
+}
+
+query GetDetailedPlayer($offset: Int, $limit: Int, $name: String, $id: Int) {
+  players(offset: $offset, limit: $limit, name: $name, id: $id) {
+    id
+    name
+    rating
+    createdAt
+    profile
+    links
+  }
+}
