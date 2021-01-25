@@ -12,7 +12,7 @@ const main = async () => {
     let games = await parsePGN("./assets/PgnMentor/players/Adams.pgn");
     console.log(games);
     // uploadPGN(games[0],client)
-    let result = await uploadPGNs(games.slice(0, 10), client);
+    let result = await uploadPGNs(games, client);
     console.log(result);
   } catch (error) {
     console.log(error);

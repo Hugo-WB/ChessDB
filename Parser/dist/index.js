@@ -17,7 +17,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         const client = new graphql_request_1.GraphQLClient("http://localhost:4000/graphql");
         let games = yield PgnParser_1.parsePGN("./assets/PgnMentor/players/Adams.pgn");
         console.log(games);
-        let result = yield GraphQL_1.uploadPGNs(games.slice(0, 10), client);
+        let result = yield GraphQL_1.uploadPGNs(games, client);
         console.log(result);
     }
     catch (error) {

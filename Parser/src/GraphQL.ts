@@ -74,11 +74,11 @@ const getPlayerIdOrCreate = async (
   if (players.length == 1) {
     return players[0].id;
   }
-  let { player } = await client.request(createPlayer, {
+  let player = await client.request(createPlayer, {
     name: name,
     rating: rating,
   });
-  return player.id;
+  return player.createPlayer.id;
 };
 
 const uploadPGNs = async (games: Game[], client: GraphQLClient) => {
@@ -118,6 +118,8 @@ const uploadPGN = async (game: Game, client: GraphQLClient) => {
     };
 
     let result = await client.request(createGame, createGameOptions);
+    // console.log(result);
+    console.log(result.createGame.games);
     return result;
   } catch (error) {
     return { error: error };

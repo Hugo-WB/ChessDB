@@ -42,7 +42,7 @@ const main = async () => {
       database: "ChessDB",
     };
 
-    app.post("/graphql",bodyParser.json(),graphqlhtt)
+    // app.post("/graphql",bodyParser.json(),graphqlhtt)
 
 
     app.use(
@@ -69,7 +69,7 @@ const main = async () => {
       schema: await buildSchema({
         resolvers: [GameResovler, PlayerResovler, UserResolver],
       }),
-      context: ({ req, res }) => ({ em: orm.em, req: req, res: res }),
+      context: ({ req, res }) => ({ em: orm.em.fork(), req: req, res: res }),
     });
 
     apolloServer.applyMiddleware({ app, cors: false });

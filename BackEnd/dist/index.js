@@ -24,7 +24,6 @@ const PlayerResolver_1 = require("./resolvers/PlayerResolver");
 const UserResolver_1 = require("./resolvers/UserResolver");
 const express_session_1 = __importDefault(require("express-session"));
 const connect_pg_simple_1 = __importDefault(require("connect-pg-simple"));
-const body_parser_1 = __importDefault(require("body-parser"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const orm = yield core_1.MikroORM.init(mikro_orm_config_1.default);
@@ -41,7 +40,6 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             port: 5432,
             database: "ChessDB",
         };
-        app.post("/graphql", body_parser_1.default.json(), graphqlhtt);
         app.use(express_session_1.default({
             name: "ch",
             store: new (connect_pg_simple_1.default(express_session_1.default))({ conObject: conObject }),
@@ -58,7 +56,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             schema: yield type_graphql_1.buildSchema({
                 resolvers: [GameResolver_1.GameResovler, PlayerResolver_1.PlayerResovler, UserResolver_1.UserResolver],
             }),
-            context: ({ req, res }) => ({ em: orm.em, req: req, res: res }),
+            context: ({ req, res }) => ({ em: orm.em.fork(), req: req, res: res }),
         });
         apolloServer.applyMiddleware({ app, cors: false });
         app.use((_, __, next) => {

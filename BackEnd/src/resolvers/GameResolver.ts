@@ -18,7 +18,7 @@ class GameResponse {
   @Field(() => String, { nullable: true })
   error?: string;
   @Field(() => [Game], { nullable: true })
-  games: Game[];
+  games?: Game[];
 }
 
 @Resolver(Game)
@@ -113,9 +113,27 @@ export class GameResovler {
         result: result,
         averageRating: averageRating,
       });
-      await em.persistAndFlush(game);
-
-      return { games: [game] };
+      let out = await (em as EntityManager)
+        .createQueryBuilder(Game)
+        .getKnexQuery()
+        .insert({
+          played_at: game.playedAt,
+          created_at: game.createdAt,
+          updated_at: game.updatedAt,
+          pgn: game.pgn,
+          white_id: game.white.id,
+          black_id: game.black.id,
+          length: game.length,
+          white_moves: game.whiteMoves,
+          black_moves: game.blackMoves,
+          average_rating: game.averageRating,
+          result: game.result,
+          opening: game.opening,
+        })
+        .returning("*");
+      let mapped = em.map(Game, out[0]);
+      console.log(mapped);
+      return { games: [mapped] };
     } catch (error) {
       if (error?.detail?.includes("already exists")) {
         return { error: "This game already exists in the database" };

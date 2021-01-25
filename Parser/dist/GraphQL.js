@@ -68,11 +68,11 @@ const getPlayerIdOrCreate = (client, name, rating) => __awaiter(void 0, void 0, 
     if (players.length == 1) {
         return players[0].id;
     }
-    let { player } = yield client.request(createPlayer, {
+    let player = yield client.request(createPlayer, {
         name: name,
         rating: rating,
     });
-    return player.id;
+    return player.createPlayer.id;
 });
 exports.getPlayerIdOrCreate = getPlayerIdOrCreate;
 const uploadPGNs = (games, client) => __awaiter(void 0, void 0, void 0, function* () {
@@ -108,6 +108,7 @@ const uploadPGN = (game, client) => __awaiter(void 0, void 0, void 0, function* 
             length: length,
         };
         let result = yield client.request(createGame, createGameOptions);
+        console.log(result.createGame.games);
         return result;
     }
     catch (error) {

@@ -96,8 +96,27 @@ let GameResovler = class GameResovler {
                     result: result,
                     averageRating: averageRating,
                 });
-                yield em.persistAndFlush(game);
-                return { games: [game] };
+                let out = yield em
+                    .createQueryBuilder(Game_1.Game)
+                    .getKnexQuery()
+                    .insert({
+                    played_at: game.playedAt,
+                    created_at: game.createdAt,
+                    updated_at: game.updatedAt,
+                    pgn: game.pgn,
+                    white_id: game.white.id,
+                    black_id: game.black.id,
+                    length: game.length,
+                    white_moves: game.whiteMoves,
+                    black_moves: game.blackMoves,
+                    average_rating: game.averageRating,
+                    result: game.result,
+                    opening: game.opening,
+                })
+                    .returning("*");
+                let mapped = em.map(Game_1.Game, out[0]);
+                console.log(mapped);
+                return { games: [mapped] };
             }
             catch (error) {
                 if ((_a = error === null || error === void 0 ? void 0 : error.detail) === null || _a === void 0 ? void 0 : _a.includes("already exists")) {
