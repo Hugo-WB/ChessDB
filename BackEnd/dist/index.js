@@ -34,7 +34,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             credentials: true,
         }));
         const conObject = {
-            user: "ChessDB",
+            user: "chessdb",
             password: "ChessDBQL",
             host: "localhost",
             port: 5432,

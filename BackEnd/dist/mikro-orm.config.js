@@ -13,7 +13,7 @@ const config = {
     dbName: "ChessDB",
     type: "postgresql",
     debug: !constants_1.__prod__,
-    user: "ChessDB",
+    user: "chessdb",
     password: "ChessDBQL",
     migrations: {
         path: path_1.default.join(__dirname, "./migrations"),
