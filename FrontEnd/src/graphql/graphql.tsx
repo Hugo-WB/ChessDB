@@ -17,6 +17,7 @@ export type Query = {
   __typename?: 'Query';
   games: GameResponse;
   players: Array<Player>;
+  searchPlayer: Array<Player>;
   me?: Maybe<User>;
 };
 
@@ -28,7 +29,7 @@ export type QueryGamesArgs = {
   opening?: Maybe<Scalars['String']>;
   minLength?: Maybe<Scalars['Int']>;
   maxLength?: Maybe<Scalars['Int']>;
-  playerId?: Maybe<Scalars['Int']>;
+  playerIds?: Maybe<Array<Scalars['Int']>>;
   id?: Maybe<Scalars['Int']>;
 };
 
@@ -38,6 +39,11 @@ export type QueryPlayersArgs = {
   limit?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['Int']>;
+};
+
+
+export type QuerySearchPlayerArgs = {
+  SearchTerms: Array<Scalars['String']>;
 };
 
 export type GameResponse = {
@@ -177,7 +183,7 @@ export type GetGamesQueryVariables = Exact<{
   opening?: Maybe<Scalars['String']>;
   minLength?: Maybe<Scalars['Int']>;
   maxLength?: Maybe<Scalars['Int']>;
-  playerId?: Maybe<Scalars['Int']>;
+  playerIds?: Maybe<Array<Scalars['Int']> | Scalars['Int']>;
   id?: Maybe<Scalars['Int']>;
 }>;
 
@@ -208,7 +214,7 @@ export type GetDetailedGameQueryVariables = Exact<{
   opening?: Maybe<Scalars['String']>;
   minLength?: Maybe<Scalars['Int']>;
   maxLength?: Maybe<Scalars['Int']>;
-  playerId?: Maybe<Scalars['Int']>;
+  playerIds?: Maybe<Array<Scalars['Int']> | Scalars['Int']>;
   id?: Maybe<Scalars['Int']>;
 }>;
 
@@ -230,6 +236,19 @@ export type GetDetailedGameQuery = (
       ) }
     )>> }
   ) }
+);
+
+export type SearchPlayersQueryVariables = Exact<{
+  searchTerms: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type SearchPlayersQuery = (
+  { __typename?: 'Query' }
+  & { searchPlayer: Array<(
+    { __typename?: 'Player' }
+    & Pick<Player, 'id'>
+  )> }
 );
 
 export type GetPlayersQueryVariables = Exact<{
@@ -266,7 +285,7 @@ export type GetDetailedPlayerQuery = (
 
 
 export const GetGamesDocument = gql`
-    query GetGames($result: String, $offset: Int, $limit: Int, $opening: String, $minLength: Int, $maxLength: Int, $playerId: Int, $id: Int) {
+    query GetGames($result: String, $offset: Int, $limit: Int, $opening: String, $minLength: Int, $maxLength: Int, $playerIds: [Int!], $id: Int) {
   games(
     result: $result
     offset: $offset
@@ -274,7 +293,7 @@ export const GetGamesDocument = gql`
     opening: $opening
     minLength: $minLength
     maxLength: $maxLength
-    playerId: $playerId
+    playerIds: $playerIds
     id: $id
   ) {
     error
@@ -316,7 +335,7 @@ export const GetGamesDocument = gql`
  *      opening: // value for 'opening'
  *      minLength: // value for 'minLength'
  *      maxLength: // value for 'maxLength'
- *      playerId: // value for 'playerId'
+ *      playerIds: // value for 'playerIds'
  *      id: // value for 'id'
  *   },
  * });
@@ -331,7 +350,7 @@ export type GetGamesQueryHookResult = ReturnType<typeof useGetGamesQuery>;
 export type GetGamesLazyQueryHookResult = ReturnType<typeof useGetGamesLazyQuery>;
 export type GetGamesQueryResult = Apollo.QueryResult<GetGamesQuery, GetGamesQueryVariables>;
 export const GetDetailedGameDocument = gql`
-    query GetDetailedGame($result: String, $offset: Int, $limit: Int, $opening: String, $minLength: Int, $maxLength: Int, $playerId: Int, $id: Int) {
+    query GetDetailedGame($result: String, $offset: Int, $limit: Int, $opening: String, $minLength: Int, $maxLength: Int, $playerIds: [Int!], $id: Int) {
   games(
     result: $result
     offset: $offset
@@ -339,7 +358,7 @@ export const GetDetailedGameDocument = gql`
     opening: $opening
     minLength: $minLength
     maxLength: $maxLength
-    playerId: $playerId
+    playerIds: $playerIds
     id: $id
   ) {
     error
@@ -386,7 +405,7 @@ export const GetDetailedGameDocument = gql`
  *      opening: // value for 'opening'
  *      minLength: // value for 'minLength'
  *      maxLength: // value for 'maxLength'
- *      playerId: // value for 'playerId'
+ *      playerIds: // value for 'playerIds'
  *      id: // value for 'id'
  *   },
  * });
@@ -400,6 +419,39 @@ export function useGetDetailedGameLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type GetDetailedGameQueryHookResult = ReturnType<typeof useGetDetailedGameQuery>;
 export type GetDetailedGameLazyQueryHookResult = ReturnType<typeof useGetDetailedGameLazyQuery>;
 export type GetDetailedGameQueryResult = Apollo.QueryResult<GetDetailedGameQuery, GetDetailedGameQueryVariables>;
+export const SearchPlayersDocument = gql`
+    query SearchPlayers($searchTerms: [String!]!) {
+  searchPlayer(SearchTerms: $searchTerms) {
+    id
+  }
+}
+    `;
+
+/**
+ * __useSearchPlayersQuery__
+ *
+ * To run a query within a React component, call `useSearchPlayersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchPlayersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchPlayersQuery({
+ *   variables: {
+ *      searchTerms: // value for 'searchTerms'
+ *   },
+ * });
+ */
+export function useSearchPlayersQuery(baseOptions: Apollo.QueryHookOptions<SearchPlayersQuery, SearchPlayersQueryVariables>) {
+        return Apollo.useQuery<SearchPlayersQuery, SearchPlayersQueryVariables>(SearchPlayersDocument, baseOptions);
+      }
+export function useSearchPlayersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchPlayersQuery, SearchPlayersQueryVariables>) {
+          return Apollo.useLazyQuery<SearchPlayersQuery, SearchPlayersQueryVariables>(SearchPlayersDocument, baseOptions);
+        }
+export type SearchPlayersQueryHookResult = ReturnType<typeof useSearchPlayersQuery>;
+export type SearchPlayersLazyQueryHookResult = ReturnType<typeof useSearchPlayersLazyQuery>;
+export type SearchPlayersQueryResult = Apollo.QueryResult<SearchPlayersQuery, SearchPlayersQueryVariables>;
 export const GetPlayersDocument = gql`
     query GetPlayers($offset: Int, $limit: Int, $name: String, $id: Int) {
   players(offset: $offset, limit: $limit, name: $name, id: $id) {

@@ -5,7 +5,7 @@ query GetGames(
   $opening: String
   $minLength: Int
   $maxLength: Int
-  $playerId: Int
+  $playerIds: [Int!]
   $id: Int
 ) {
   games(
@@ -15,7 +15,7 @@ query GetGames(
     opening: $opening
     minLength: $minLength
     maxLength: $maxLength
-    playerId: $playerId
+    playerIds: $playerIds
     id: $id
   ) {
     error
@@ -38,7 +38,6 @@ query GetGames(
   }
 }
 
-
 query GetDetailedGame(
   $result: String
   $offset: Int
@@ -46,7 +45,7 @@ query GetDetailedGame(
   $opening: String
   $minLength: Int
   $maxLength: Int
-  $playerId: Int
+  $playerIds: [Int!]
   $id: Int
 ) {
   games(
@@ -56,7 +55,7 @@ query GetDetailedGame(
     opening: $opening
     minLength: $minLength
     maxLength: $maxLength
-    playerId: $playerId
+    playerIds: $playerIds
     id: $id
   ) {
     error
@@ -81,6 +80,12 @@ query GetDetailedGame(
         rating
       }
     }
+  }
+}
+
+query SearchPlayers($searchTerms: [String!]!) {
+  searchPlayer(SearchTerms: $searchTerms) {
+    id
   }
 }
 

@@ -1,13 +1,21 @@
-import { Spinner } from "evergreen-ui";
+import { StackDivider, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { GetGamesDocument, useGetGamesQuery } from "../graphql/graphql";
+import {
+  GetGamesDocument,
+  GetGamesQueryVariables,
+  useGetGamesQuery,
+} from "../graphql/graphql";
 import { AdvancedSearch, BasicSearch } from "../pages/types";
 import GameCard from "./GameCard";
 
-interface Props {}
+interface Props {
+  query: GetGamesQueryVariables;
+}
 
-const Results = (props: Props) => {
-  const { loading, error, data } = useGetGamesQuery({ variables: {limit:5} });
+const Results = ({ query }: Props) => {
+  const { loading, error, data } = useGetGamesQuery({
+    variables: { limit: 10, ...query },
+  });
 
   if (loading) {
     return <div>loading</div>;
@@ -17,11 +25,14 @@ const Results = (props: Props) => {
   }
   console.log(data);
   return (
-    <div>
+    <VStack
+      // divider={<StackDivider borderColor="gray.200" />}
+      p={8}
+    >
       {data?.games.games?.map((game) => {
         return <GameCard game={game} />;
       })}
-    </div>
+    </VStack>
   );
 };
 

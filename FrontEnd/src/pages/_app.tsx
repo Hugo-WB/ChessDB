@@ -7,6 +7,7 @@ import {
   gql,
   InMemoryCache,
 } from "@apollo/client";
+import { ChakraProvider } from "@chakra-ui/react";
 
 let MyApp = ({ Component, pageProps }: AppProps) => {
   const client = new ApolloClient({
@@ -16,7 +17,9 @@ let MyApp = ({ Component, pageProps }: AppProps) => {
 
   return (
     <ApolloProvider client={client}>
-      <Component {...pageProps} />
+      <ChakraProvider>
+        <Component {...pageProps} />
+      </ChakraProvider>
     </ApolloProvider>
   );
 };

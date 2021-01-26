@@ -48,7 +48,19 @@ let PlayerResovler = class PlayerResovler {
                 .offset(offset !== null && offset !== void 0 ? offset : 0)
                 .limit(Math.min(limit, 30));
             let players = results.map((player) => em.map(Player_1.Player, player));
-            console.log;
+            return players;
+        });
+    }
+    searchPlayer(searchTerms, { em }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            searchTerms = searchTerms.map((term) => "(?=.*" + term + ")");
+            console.log(searchTerms);
+            let results = yield em
+                .createQueryBuilder(Player_1.Player)
+                .getKnexQuery()
+                .where("name", "~*", searchTerms.join(""))
+                .limit(10);
+            let players = results.map((player) => em.map(Player_1.Player, player));
             return players;
         });
     }
@@ -106,6 +118,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, String, Number, Number, Object]),
     __metadata("design:returntype", Promise)
 ], PlayerResovler.prototype, "players", null);
+__decorate([
+    type_graphql_1.Query(() => [Player_1.Player]),
+    __param(0, type_graphql_1.Arg("SearchTerms", () => [String])),
+    __param(1, type_graphql_1.Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Array, Object]),
+    __metadata("design:returntype", Promise)
+], PlayerResovler.prototype, "searchPlayer", null);
 __decorate([
     type_graphql_1.Mutation(() => PlayerResponse, { nullable: true }),
     __param(0, type_graphql_1.Arg("name")),

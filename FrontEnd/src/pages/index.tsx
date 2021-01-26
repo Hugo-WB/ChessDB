@@ -1,39 +1,26 @@
 // React:
 import React, { useState } from "react";
 
-// Evergreen:
-import {
-  Autocomplete,
-  Button,
-  Combobox,
-  Heading,
-  Pane,
-  TextInput,
-} from "evergreen-ui";
-
 // Types:
 import { BasicSearch, AdvancedSearch } from "./types";
 
 // Components:
 import SearchForm from "../components/SearchForm";
 import Results from "../components/Results";
-import { useQuery } from "@apollo/client";
-import { GetGamesDocument, useGetGamesQuery } from "../graphql/graphql";
+import { Box } from "@chakra-ui/react";
+import { GetGamesQueryVariables } from "../graphql/graphql";
 
 interface Props {}
 
 const index = (props: Props) => {
-  let { error, loading, data } = useGetGamesQuery();
-  if (!data) return "Loading...";
+  let [query, setQuery] = useState<GetGamesQueryVariables | undefined>(
+    undefined
+  );
   return (
-    <>
-      <Pane>
-        <Heading>ChessDB</Heading>
-      </Pane>
-      <Pane>
-        <Results />
-      </Pane>
-    </>
+    <Box mt={8} mx="auto" maxW="800px" w="100%">
+      <SearchForm setQuery={setQuery} />
+      {query ? <Results query={query} /> : null}
+    </Box>
   );
 };
 

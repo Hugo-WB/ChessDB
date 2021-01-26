@@ -39,7 +39,7 @@ GameResponse = __decorate([
     type_graphql_1.ObjectType()
 ], GameResponse);
 let GameResovler = class GameResovler {
-    games(gameId, playerId, maxLength, minLength, opening, limit, offset, result, { em }) {
+    games(gameId, playerIds, maxLength, minLength, opening, limit, offset, result, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let results = yield em
@@ -48,10 +48,10 @@ let GameResovler = class GameResovler {
                     .orderBy("average_rating", "desc")
                     .where(Object.assign({}, gameId === undefined ? null : { id: gameId }, opening === undefined ? null : { opening: opening }, result === undefined ? null : { result: result }))
                     .andWhere((builder) => {
-                    if (playerId) {
+                    if ((playerIds === null || playerIds === void 0 ? void 0 : playerIds.length) > 0) {
                         builder
-                            .where({ white_id: playerId })
-                            .orWhere({ black_id: playerId });
+                            .whereIn("white_id", playerIds)
+                            .orWhereIn("black_id", playerIds);
                     }
                     if (maxLength) {
                         builder.where("length", "<=", maxLength);
@@ -152,7 +152,7 @@ let GameResovler = class GameResovler {
 __decorate([
     type_graphql_1.Query(() => GameResponse),
     __param(0, type_graphql_1.Arg("id", () => type_graphql_1.Int, { nullable: true })),
-    __param(1, type_graphql_1.Arg("playerId", () => type_graphql_1.Int, { nullable: true })),
+    __param(1, type_graphql_1.Arg("playerIds", () => [type_graphql_1.Int], { nullable: true })),
     __param(2, type_graphql_1.Arg("maxLength", () => type_graphql_1.Int, { nullable: true })),
     __param(3, type_graphql_1.Arg("minLength", () => type_graphql_1.Int, { nullable: true })),
     __param(4, type_graphql_1.Arg("opening", { nullable: true })),
@@ -161,7 +161,7 @@ __decorate([
     __param(7, type_graphql_1.Arg("result", () => String, { nullable: true })),
     __param(8, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number, Number, Number, String, Number, Number, String, Object]),
+    __metadata("design:paramtypes", [Number, Array, Number, Number, String, Number, Number, String, Object]),
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "games", null);
 __decorate([

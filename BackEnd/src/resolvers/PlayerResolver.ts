@@ -43,13 +43,30 @@ export class PlayerResovler {
           name === undefined ? null : { name }
         )
       )
-      .orderBy("rating","desc")
+      .orderBy("rating", "desc")
       .offset(offset ?? 0)
       .limit(Math.min(limit, 30));
     let players: Player[] = results.map((player: any) =>
       em.map(Player, player)
     );
-    console.log;
+    return players;
+  }
+
+  @Query(() => [Player])
+  async searchPlayer(
+    @Arg("SearchTerms", () => [String]) searchTerms: string[],
+    @Ctx() { em }: MyContext
+  ) {
+    searchTerms = searchTerms.map((term) => "(?=.*" + term + ")");
+    console.log(searchTerms);
+    let results = await (em as EntityManager)
+      .createQueryBuilder(Player)
+      .getKnexQuery()
+      .where("name", "~*", searchTerms.join(""))
+      .limit(10);
+    let players: Player[] = results.map((player: any) =>
+      em.map(Player, player)
+    );
     return players;
   }
 

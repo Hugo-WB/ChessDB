@@ -27,7 +27,7 @@ export class GameResovler {
   @Query(() => GameResponse)
   async games(
     @Arg("id", () => Int, { nullable: true }) gameId: number,
-    @Arg("playerId", () => Int, { nullable: true }) playerId: number,
+    @Arg("playerIds", () => [Int], { nullable: true }) playerIds: number[],
     @Arg("maxLength", () => Int, { nullable: true }) maxLength: number,
     @Arg("minLength", () => Int, { nullable: true }) minLength: number,
     @Arg("opening", { nullable: true }) opening: string,
@@ -51,10 +51,10 @@ export class GameResovler {
           )
         )
         .andWhere((builder) => {
-          if (playerId) {
+          if (playerIds?.length > 0) {
             builder
-              .where({ white_id: playerId })
-              .orWhere({ black_id: playerId });
+              .whereIn("white_id", playerIds)
+              .orWhereIn("black_id", playerIds);
           }
           if (maxLength) {
             builder.where("length", "<=", maxLength);
