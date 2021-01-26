@@ -62,7 +62,7 @@ export class PlayerResovler {
     let results = await (em as EntityManager)
       .createQueryBuilder(Player)
       .getKnexQuery()
-      .where("name", "~*", searchTerms.join(""))
+      .where("name", "~*", searchTerms.join("") + ").*")
       .limit(10);
     let players: Player[] = results.map((player: any) =>
       em.map(Player, player)

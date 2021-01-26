@@ -39,7 +39,7 @@ GameResponse = __decorate([
     type_graphql_1.ObjectType()
 ], GameResponse);
 let GameResovler = class GameResovler {
-    games(gameId, playerIds, maxLength, minLength, opening, limit, offset, result, { em }) {
+    games(gameId, playerIds, maxLength, minLength, opening, startingMoves, limit, offset, result, { em }) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let results = yield em
@@ -58,6 +58,19 @@ let GameResovler = class GameResovler {
                     }
                     if (minLength) {
                         builder.where("length", ">=", minLength);
+                    }
+                    if ((startingMoves === null || startingMoves === void 0 ? void 0 : startingMoves.length) > 0) {
+                        builder
+                            .whereRaw("cast(black_moves AS text) ~* " +
+                            "'{" +
+                            startingMoves +
+                            ".*" +
+                            "'")
+                            .orWhereRaw("cast(white_moves AS text) ~* " +
+                            "'{" +
+                            startingMoves +
+                            ".*" +
+                            "'");
                     }
                 })
                     .offset(offset !== null && offset !== void 0 ? offset : 0)
@@ -156,12 +169,13 @@ __decorate([
     __param(2, type_graphql_1.Arg("maxLength", () => type_graphql_1.Int, { nullable: true })),
     __param(3, type_graphql_1.Arg("minLength", () => type_graphql_1.Int, { nullable: true })),
     __param(4, type_graphql_1.Arg("opening", { nullable: true })),
-    __param(5, type_graphql_1.Arg("limit", () => type_graphql_1.Int, { nullable: true, defaultValue: 20 })),
-    __param(6, type_graphql_1.Arg("offset", () => type_graphql_1.Int, { nullable: true })),
-    __param(7, type_graphql_1.Arg("result", () => String, { nullable: true })),
-    __param(8, type_graphql_1.Ctx()),
+    __param(5, type_graphql_1.Arg("startingMoves", () => String, { nullable: true })),
+    __param(6, type_graphql_1.Arg("limit", () => type_graphql_1.Int, { nullable: true, defaultValue: 20 })),
+    __param(7, type_graphql_1.Arg("offset", () => type_graphql_1.Int, { nullable: true })),
+    __param(8, type_graphql_1.Arg("result", () => String, { nullable: true })),
+    __param(9, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Array, Number, Number, String, Number, Number, String, Object]),
+    __metadata("design:paramtypes", [Number, Array, Number, Number, String, String, Number, Number, String, Object]),
     __metadata("design:returntype", Promise)
 ], GameResovler.prototype, "games", null);
 __decorate([

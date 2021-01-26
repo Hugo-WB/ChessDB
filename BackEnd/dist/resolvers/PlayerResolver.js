@@ -58,7 +58,7 @@ let PlayerResovler = class PlayerResovler {
             let results = yield em
                 .createQueryBuilder(Player_1.Player)
                 .getKnexQuery()
-                .where("name", "~*", searchTerms.join(""))
+                .where("name", "~*", searchTerms.join("") + ").*")
                 .limit(10);
             let players = results.map((player) => em.map(Player_1.Player, player));
             return players;

@@ -31,6 +31,8 @@ export class GameResovler {
     @Arg("maxLength", () => Int, { nullable: true }) maxLength: number,
     @Arg("minLength", () => Int, { nullable: true }) minLength: number,
     @Arg("opening", { nullable: true }) opening: string,
+    @Arg("startingMoves", () => String, { nullable: true })
+    startingMoves: string,
     @Arg("limit", () => Int, { nullable: true, defaultValue: 20 })
     limit: number,
     @Arg("offset", () => Int, { nullable: true }) offset: number,
@@ -61,6 +63,23 @@ export class GameResovler {
           }
           if (minLength) {
             builder.where("length", ">=", minLength);
+          }
+          if (startingMoves?.length > 0) {
+            builder
+              .whereRaw(
+                "cast(black_moves AS text) ~* " +
+                  "'{" +
+                  startingMoves +
+                  ".*" +
+                  "'"
+              )
+              .orWhereRaw(
+                "cast(white_moves AS text) ~* " +
+                  "'{" +
+                  startingMoves +
+                  ".*" +
+                  "'"
+              );
           }
         })
         .offset(offset ?? 0)
