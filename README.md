@@ -6,16 +6,34 @@
 > GraphQL Chess games database API. With a ReactJS and NextJS front-end
 
 <!-- ### 🏠 [Homepage](https://hugo-wb.github.io/ChessDB) -->
+
 ### 🧪[GraphQL API](http://35.174.144.128:4000/graphql)
 
+## About
 
+### Backend
+
+Made using mikro-orm, apollo-server-express, Knex.JS and type-graphql.
+Using PostgreSQL for the database.
+
+Hosted on AWS EC2 VPS, please use the API responsibly.
+
+Thanks to [PGN Mentor](http://www.pgnmentor.com/) for providing the PGNs used for this project.
+
+### FrontEnd
+
+Made using ReactJS, NextJS and Chakra-ui.
+
+Still WIP.
+
+Mostly learnt from [Ben Awad](https://youtu.be/I6ypD7qv3Z8)
 
 ## Author
 
 👤 **Hugo Wong-Berard**
 
-* Website: hugo-wb.github.io
-* Github: [@hugo-wb](https://github.com/hugo-wb)
+- Website: hugo-wb.github.io
+- Github: [@hugo-wb](https://github.com/hugo-wb)
 
 ## Show your support
 
