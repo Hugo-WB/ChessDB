@@ -5,7 +5,10 @@
 
 > GraphQL Chess games database API. With a ReactJS and NextJS front-end
 
-### 🏠 [Homepage](https://hugo-wb.github.io/ChessDB)
+<!-- ### 🏠 [Homepage](https://hugo-wb.github.io/ChessDB) -->
+### 🧪[GraphQL API](http://35.174.144.128:4000/graphql)
+
+
 
 ## Author
 
