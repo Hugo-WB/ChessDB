@@ -26,7 +26,10 @@ Made using ReactJS, NextJS and Chakra-ui.
 
 Still WIP.
 
-Mostly learnt from [Ben Awad](https://youtu.be/I6ypD7qv3Z8)
+
+### Credits
+
+Learnt most of these technologies from [this video](https://youtu.be/I6ypD7qv3Z8) by Ben Awad.
 
 ## Author
 
