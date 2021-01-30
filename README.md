@@ -7,7 +7,7 @@
 
 <!-- ### 🏠 [Homepage](https://hugo-wb.github.io/ChessDB) -->
 
-### 🧪[GraphQL API](http://35.174.144.128:4000/graphql)
+### 🧪[GraphQL API (not updated yet)](http://35.174.144.128:4000/graphql) 
 
 ## About
 
